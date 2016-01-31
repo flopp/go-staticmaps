@@ -10,6 +10,9 @@ import (
 	"image"
 	"image/draw"
 	"math"
+
+	"github.com/cheggaaa/pb"
+	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 // MapCreator class
@@ -22,6 +25,8 @@ type MapCreator struct {
 
 	hasCenter bool
 	center    LatLng
+
+	markers []Marker
 }
 
 // NewMapCreator creates a new instance of MapCreator
@@ -52,6 +57,22 @@ func (m *MapCreator) SetCenter(center LatLng) {
 	m.hasCenter = true
 }
 
+func (m *MapCreator) AddMarker(marker Marker) {
+	n := len(m.markers)
+	if n == cap(m.markers) {
+		// Grow. We double its size and add 1, so if the size is zero we still grow.
+		newSlice := make([]Marker, n, 2*n+1)
+		copy(newSlice, m.markers)
+		m.markers = newSlice
+	}
+	m.markers = m.markers[0 : n+1]
+	m.markers[n] = marker
+}
+
+func (m *MapCreator) ClearMarkers() {
+	m.markers = m.markers[0:0]
+}
+
 func ll2xy(ll LatLng, zoom uint) (float64, float64) {
 	tiles := math.Exp2(float64(zoom))
 	x := tiles * (ll.Lng() + 180.0) / 360.0
@@ -68,48 +89,61 @@ func (m *MapCreator) Create() (image.Image, error) {
 		return nil, errors.New("No zoom specified")
 	}
 
-	tile_size := 256
-	tiles_x := int(math.Ceil(float64(m.width)/float64(tile_size))) + 2
-	tiles_y := int(math.Ceil(float64(m.height)/float64(tile_size))) + 2
-
-	x_offset := -int(math.Floor(float64(tiles_x) * 0.5))
-	y_offset := -int(math.Floor(float64(tiles_y) * 0.5))
-
 	center_x, center_y := ll2xy(m.center, m.zoom)
-	center_tile_x := int(center_x)
-	center_tile_y := int(center_y)
-	//origin_x := center_tile_x + x_offset
-	//origin_y := center_tile_y + y_offset
 
-	imageWidth := tiles_x * tile_size
-	imageHeight := tiles_y * tile_size
+	tile_size := 256
+	ww := float64(m.width) / float64(tile_size)
+	hh := float64(m.height) / float64(tile_size)
+	imgTileOriginX := int(center_x - 0.5*ww)
+	imgTileOriginY := int(center_y - 0.5*hh)
+	tileCountX := 1 + int(center_x+0.5*ww) - imgTileOriginX
+	tileCountY := 1 + int(center_y+0.5*hh) - imgTileOriginY
+
+	imageWidth := tileCountX * tile_size
+	imageHeight := tileCountY * tile_size
 	img := image.NewRGBA(image.Rect(0, 0, imageWidth, imageHeight))
 
 	t := NewTileFetcher("http://otile1.mqcdn.com/tiles/1.0.0/osm/%[1]d/%[2]d/%[3]d.png", "cache")
 
-	for xx := 0; xx < tiles_x; xx++ {
-		x := center_tile_x + xx + x_offset
-		// if x < 0 {
-		// 	x = x + math.Exp2(float64(m.zoom))
-		// }
-		for yy := 0; yy < tiles_y; yy++ {
-			y := center_tile_y + yy + y_offset
-
+	bar := pb.StartNew(tileCountX * tileCountY).Prefix("Fetching tiles: ")
+	for xx := 0; xx < tileCountX; xx++ {
+		x := imgTileOriginX + xx
+		if x < 0 {
+			x = x + (1 << m.zoom)
+		}
+		for yy := 0; yy < tileCountY; yy++ {
+			y := imgTileOriginY + yy
+			bar.Increment()
 			tileImg, err := t.Fetch(m.zoom, x, y)
 
 			if err == nil {
-				draw.Draw(img, image.Rect(xx*tile_size, yy*tile_size, (xx+1)*tile_size, (yy+1)*tile_size),
-					tileImg, image.ZP, draw.Src)
+				rect := image.Rect(xx*tile_size, yy*tile_size, (xx+1)*tile_size, (yy+1)*tile_size)
+				draw.Draw(img, rect, tileImg, image.ZP, draw.Src)
 			}
 		}
 	}
+	bar.Finish()
 
-	center_pixel_x := int((float64(x_offset) + center_x - float64(int(center_x))) * float64(tile_size))
-	center_pixel_y := int((float64(y_offset) + center_y - float64(int(center_y))) * float64(tile_size))
+	imgCenterPixelX := int((center_x - float64(imgTileOriginX)) * float64(tile_size))
+	imgCenterPixelY := int((center_y - float64(imgTileOriginY)) * float64(tile_size))
+
+	gc := draw2dimg.NewGraphicContext(img)
+
+	for i := range m.markers {
+		marker := m.markers[i]
+		gc.SetStrokeColor(marker.Color)
+		gc.SetFillColor(marker.Color)
+		x, y := ll2xy(marker.Position, m.zoom)
+		x = float64(imgCenterPixelX) + (x-center_x)*float64(tile_size)
+		y = float64(imgCenterPixelY) + (y-center_y)*float64(tile_size)
+		gc.ArcTo(x, y, marker.Size, marker.Size, 0, 2*math.Pi)
+		gc.Close()
+		gc.FillStroke()
+	}
 
 	croppedImg := image.NewRGBA(image.Rect(0, 0, m.width, m.height))
 	draw.Draw(croppedImg, image.Rect(0, 0, m.width, m.height),
-		img, image.Point{m.width/2 - center_pixel_x, m.height/2 - center_pixel_y},
+		img, image.Point{imgCenterPixelX - m.width/2, imgCenterPixelY - m.height/2},
 		draw.Src)
 
 	return croppedImg, nil
