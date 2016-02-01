@@ -17,8 +17,8 @@ import (
 
 // MapCreator class
 type MapCreator struct {
-	width  int
-	height int
+	width  uint
+	height uint
 
 	hasZoom bool
 	zoom    uint
@@ -40,7 +40,7 @@ func NewMapCreator() *MapCreator {
 }
 
 // SetSize sets the size of the generated image
-func (m *MapCreator) SetSize(width, height int) {
+func (m *MapCreator) SetSize(width, height uint) {
 	m.width = width
 	m.height = height
 }
@@ -141,9 +141,9 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.FillStroke()
 	}
 
-	croppedImg := image.NewRGBA(image.Rect(0, 0, m.width, m.height))
-	draw.Draw(croppedImg, image.Rect(0, 0, m.width, m.height),
-		img, image.Point{imgCenterPixelX - m.width/2, imgCenterPixelY - m.height/2},
+	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
+	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
+		img, image.Point{imgCenterPixelX - int(m.width)/2, imgCenterPixelY - int(m.height)/2},
 		draw.Src)
 
 	return croppedImg, nil
