@@ -1,5 +1,6 @@
 # go-staticmaps
-Render static map images with go
+Render static map images with go using OpenStreetMap tiles.
+
 
 ## Installation
 
