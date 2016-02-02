@@ -17,11 +17,11 @@ import (
 func main() {
 	var opts struct {
 		//		ClearCache bool     `long:"clear-cache" description:"Clears the tile cache"`
-		Width   uint     `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
-		Height  uint     `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
+		Width   int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
+		Height  int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
 		Output  string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
 		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
-		Zoom    uint     `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL" default:"14"`
+		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 	}
 
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	if parser.FindOptionByLongName("center").IsSet() {
-		center, err := staticmaps.LatLngFromString(opts.Center)
+		center, err := staticmaps.ParseLatLngFromString(opts.Center)
 		if err == nil {
 			m.SetCenter(center)
 		} else {

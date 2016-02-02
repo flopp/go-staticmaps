@@ -7,6 +7,7 @@ Render static map images with go
     go get -u github.com/cheggaaa/pb
     go get -u github.com/llgcode/draw2d/draw2dimg
     go get -u github.com/jessevdk/go-flags
+    go get -u github.com/golang/geo/s2
 
 ## Usage
 

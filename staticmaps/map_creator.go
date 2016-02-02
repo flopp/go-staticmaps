@@ -7,25 +7,27 @@ package staticmaps
 
 import (
 	"errors"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"math"
 
 	"github.com/cheggaaa/pb"
+	"github.com/golang/geo/s2"
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 // MapCreator class
 type MapCreator struct {
-	width  uint
-	height uint
+	width  int
+	height int
 
 	hasZoom bool
-	zoom    uint
+	zoom    int
 
 	hasCenter bool
-	center    LatLng
+	center    s2.LatLng
 
 	markers []Marker
 }
@@ -41,23 +43,24 @@ func NewMapCreator() *MapCreator {
 }
 
 // SetSize sets the size of the generated image
-func (m *MapCreator) SetSize(width, height uint) {
+func (m *MapCreator) SetSize(width, height int) {
 	m.width = width
 	m.height = height
 }
 
 // SetZoom sets the zoom level
-func (m *MapCreator) SetZoom(zoom uint) {
+func (m *MapCreator) SetZoom(zoom int) {
 	m.zoom = zoom
 	m.hasZoom = true
 }
 
 // SetCenter sets the center coordinates
-func (m *MapCreator) SetCenter(center LatLng) {
+func (m *MapCreator) SetCenter(center s2.LatLng) {
 	m.center = center
 	m.hasCenter = true
 }
 
+// AddMarker adds a marker to the MapCreator
 func (m *MapCreator) AddMarker(marker Marker) {
 	n := len(m.markers)
 	if n == cap(m.markers) {
@@ -70,27 +73,74 @@ func (m *MapCreator) AddMarker(marker Marker) {
 	m.markers[n] = marker
 }
 
+// ClearMarkers removes all markers from the MapCreator
 func (m *MapCreator) ClearMarkers() {
 	m.markers = m.markers[0:0]
 }
 
-func ll2xy(ll LatLng, zoom uint) (float64, float64) {
+func ll2xy(ll s2.LatLng, zoom int) (float64, float64) {
 	tiles := math.Exp2(float64(zoom))
-	x := tiles * (ll.Lng() + 180.0) / 360.0
-	y := tiles * (1 - math.Log(math.Tan(ll.LatRadians())+(1.0/math.Cos(ll.LatRadians())))/math.Pi) / 2.0
+	x := tiles * (ll.Lng.Degrees() + 180.0) / 360.0
+	y := tiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
 	return x, y
+}
+
+func (m *MapCreator) determineBounds() s2.Rect {
+	r := s2.EmptyRect()
+	for _, marker := range m.markers {
+		r = r.AddPoint(marker.Position)
+	}
+	return r
+}
+
+func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
+	b := bounds.AddPoint(center)
+	if b.IsEmpty() || b.IsPoint() {
+		return 15
+	}
+
+	tileSize := 256
+	margin := 16
+	w := float64(m.width-2*margin) / float64(tileSize)
+	h := float64(m.height-2*margin) / float64(tileSize)
+	minX := (b.Lo().Lng.Degrees() + 180.0) / 360.0
+	maxX := (b.Hi().Lng.Degrees() + 180.0) / 360.0
+	minY := (1.0 - math.Log(math.Tan(b.Lo().Lat.Radians())+(1.0/math.Cos(b.Lo().Lat.Radians())))/math.Pi) / 2.0
+	maxY := (1.0 - math.Log(math.Tan(b.Hi().Lat.Radians())+(1.0/math.Cos(b.Hi().Lat.Radians())))/math.Pi) / 2.0
+	dx := math.Abs(maxX - minX)
+	dy := math.Abs(maxY - minY)
+
+	zoom := 1
+	for zoom < 30 {
+		tiles := float64(uint(1) << uint(zoom))
+		if dx*tiles > w || dy*tiles > h {
+			return zoom - 1
+		}
+		zoom = zoom + 1
+	}
+
+	return 15
 }
 
 // Create actually creates the image
 func (m *MapCreator) Create() (image.Image, error) {
+	bounds := m.determineBounds()
+
+	center := m.center
 	if !m.hasCenter {
-		return nil, errors.New("No center coordinates specified")
-	}
-	if !m.hasZoom {
-		return nil, errors.New("No zoom specified")
+		if bounds.IsEmpty() {
+			return nil, errors.New("No center coordinates specified, cannot determine center from markers")
+		}
+		center = bounds.Center()
 	}
 
-	center_x, center_y := ll2xy(m.center, m.zoom)
+	zoom := m.zoom
+	if !m.hasZoom {
+		zoom = m.determineZoom(bounds, center)
+	}
+	fmt.Println("zoom", zoom)
+
+	center_x, center_y := ll2xy(center, zoom)
 
 	tile_size := 256
 	ww := float64(m.width) / float64(tile_size)
@@ -110,12 +160,12 @@ func (m *MapCreator) Create() (image.Image, error) {
 	for xx := 0; xx < tileCountX; xx++ {
 		x := imgTileOriginX + xx
 		if x < 0 {
-			x = x + (1 << m.zoom)
+			x = x + (1 << uint(zoom))
 		}
 		for yy := 0; yy < tileCountY; yy++ {
 			y := imgTileOriginY + yy
 			bar.Increment()
-			tileImg, err := t.Fetch(m.zoom, x, y)
+			tileImg, err := t.Fetch(zoom, x, y)
 
 			if err == nil {
 				rect := image.Rect(xx*tile_size, yy*tile_size, (xx+1)*tile_size, (yy+1)*tile_size)
@@ -134,7 +184,7 @@ func (m *MapCreator) Create() (image.Image, error) {
 		marker := m.markers[i]
 		gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
 		gc.SetFillColor(marker.Color)
-		x, y := ll2xy(marker.Position, m.zoom)
+		x, y := ll2xy(marker.Position, zoom)
 		x = float64(imgCenterPixelX) + (x-center_x)*float64(tile_size)
 		y = float64(imgCenterPixelY) + (y-center_y)*float64(tile_size)
 		radius := 0.5 * marker.Size

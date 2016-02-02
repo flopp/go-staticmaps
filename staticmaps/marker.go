@@ -11,10 +11,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/golang/geo/s2"
 )
 
 type Marker struct {
-	Position LatLng
+	Position s2.LatLng
 	Color    color.RGBA
 	Size     float64
 }
@@ -87,7 +89,7 @@ func ParseMarkerString(s string) ([]Marker, error) {
 			}
 			size = size_
 		} else {
-			ll, err := LatLngFromString(ss)
+			ll, err := ParseLatLngFromString(ss)
 			if err != nil {
 				return nil, err
 			}

@@ -7,11 +7,10 @@ package staticmaps
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"image"
-	_ "image/jpeg"
-	_ "image/png"
+	_ "image/jpeg" // to be able to decode jpegs
+	_ "image/png"  // to be able to decode pngs
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -19,30 +18,30 @@ import (
 )
 
 type TileFetcher struct {
-	url_schema string
-	cache_dir  string
+	urlSchema string
+	cacheDir  string
 }
 
-func NewTileFetcher(url_schema, cache_dir string) *TileFetcher {
+func NewTileFetcher(urlSchema, cacheDir string) *TileFetcher {
 	t := new(TileFetcher)
-	t.url_schema = url_schema
-	t.cache_dir = cache_dir
+	t.urlSchema = urlSchema
+	t.cacheDir = cacheDir
 	return t
 }
 
-func (t *TileFetcher) url(zoom uint, x, y int) string {
-	return fmt.Sprintf(t.url_schema, zoom, x, y)
+func (t *TileFetcher) url(zoom, x, y int) string {
+	return fmt.Sprintf(t.urlSchema, zoom, x, y)
 }
 
-func (t *TileFetcher) cache_file_name(zoom uint, x, y int) string {
-	return fmt.Sprintf("%s/%d-%d-%d", t.cache_dir, zoom, x, y)
+func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
+	return fmt.Sprintf("%s/%d-%d-%d", t.cacheDir, zoom, x, y)
 }
 
-func (t *TileFetcher) Fetch(zoom uint, x, y int) (image.Image, error) {
-	file_name := t.cache_file_name(zoom, x, y)
-	cached_img, err := t.load_cache(file_name)
+func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
+	fileName := t.cacheFileName(zoom, x, y)
+	cachedImg, err := t.loadCache(fileName)
 	if err == nil {
-		return cached_img, nil
+		return cachedImg, nil
 	}
 
 	url := t.url(zoom, x, y)
@@ -56,10 +55,10 @@ func (t *TileFetcher) Fetch(zoom uint, x, y int) (image.Image, error) {
 		return nil, err
 	}
 
-	err = t.store_cache(file_name, data)
+	err = t.storeCache(fileName, data)
 	if err != nil {
-		fmt.Println("Failed to store image as", file_name)
-        fmt.Println(err)
+		fmt.Println("Failed to store image as", fileName)
+		fmt.Println(err)
 	}
 
 	return img, nil
@@ -81,8 +80,8 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 	return contents, nil
 }
 
-func (t *TileFetcher) load_cache(file_name string) (image.Image, error) {
-	file, err := os.Open(file_name)
+func (t *TileFetcher) loadCache(fileName string) (image.Image, error) {
+	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
@@ -96,28 +95,27 @@ func (t *TileFetcher) load_cache(file_name string) (image.Image, error) {
 	return img, nil
 }
 
-func (t *TileFetcher) create_cache_dir() error {
-	src, err := os.Stat(t.cache_dir)
+func (t *TileFetcher) createCacheDir() error {
+	src, err := os.Stat(t.cacheDir)
 	if err != nil {
-        if os.IsNotExist(err) {
-            return os.Mkdir(t.cache_dir, 0777)
-        } else {
-            return err
-        }
+		if os.IsNotExist(err) {
+			return os.Mkdir(t.cacheDir, 0777)
+		}
+		return err
 	}
 	if src.IsDir() {
 		return nil
 	}
-	return errors.New(fmt.Sprintf("File exists but is not a directory: %s", t.cache_dir))
+	return fmt.Errorf("File exists but is not a directory: %s", t.cacheDir)
 }
 
-func (t *TileFetcher) store_cache(file_name string, data []byte) error {
-	err := t.create_cache_dir()
+func (t *TileFetcher) storeCache(fileName string, data []byte) error {
+	err := t.createCacheDir()
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Create(file_name)
+	file, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
