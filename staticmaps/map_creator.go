@@ -8,6 +8,7 @@ package staticmaps
 import (
 	"errors"
 	"image"
+	"image/color"
 	"image/draw"
 	"math"
 
@@ -131,12 +132,13 @@ func (m *MapCreator) Create() (image.Image, error) {
 
 	for i := range m.markers {
 		marker := m.markers[i]
-		gc.SetStrokeColor(marker.Color)
+		gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
 		gc.SetFillColor(marker.Color)
 		x, y := ll2xy(marker.Position, m.zoom)
 		x = float64(imgCenterPixelX) + (x-center_x)*float64(tile_size)
 		y = float64(imgCenterPixelY) + (y-center_y)*float64(tile_size)
-		gc.ArcTo(x, y, marker.Size, marker.Size, 0, 2*math.Pi)
+		radius := 0.5 * marker.Size
+		gc.ArcTo(x, y, radius, radius, 0, 2*math.Pi)
 		gc.Close()
 		gc.FillStroke()
 	}

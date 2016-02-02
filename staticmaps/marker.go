@@ -53,26 +53,45 @@ func ParseColorString(s string) (color.RGBA, error) {
 	}
 }
 
+func ParseSizeString(s string) (float64, error) {
+	if s == "mid" {
+		return 16.0, nil
+	} else if s == "small" {
+		return 12.0, nil
+	} else if s == "tiny" {
+		return 8.0, nil
+	}
+
+	return 0.0, fmt.Errorf("Cannot parse size string: %s", s)
+}
+
 func ParseMarkerString(s string) ([]Marker, error) {
 	markers := make([]Marker, 0, 0)
+
 	color := color.RGBA{0xff, 0, 0, 0xff}
+	size := 16.0
+
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
-			c, err := ParseColorString(strings.TrimPrefix(ss, "color:"))
+			color_, err := ParseColorString(strings.TrimPrefix(ss, "color:"))
 			if err != nil {
 				return nil, err
 			}
-			color = c
+			color = color_
 		} else if strings.HasPrefix(ss, "label:") {
 			// TODO
 		} else if strings.HasPrefix(ss, "size:") {
-			// TODO
+			size_, err := ParseSizeString(strings.TrimPrefix(ss, "size:"))
+			if err != nil {
+				return nil, err
+			}
+			size = size_
 		} else {
 			ll, err := LatLngFromString(ss)
 			if err != nil {
 				return nil, err
 			}
-			marker := Marker{ll, color, 5}
+			marker := Marker{ll, color, size}
 			// append marker
 			n := len(markers)
 			if n == cap(markers) {
