@@ -18,19 +18,24 @@ import (
 )
 
 type TileFetcher struct {
-	urlSchema string
-	cacheDir  string
+	tileProvider *TileProvider
+	cacheDir     string
 }
 
-func NewTileFetcher(urlSchema, cacheDir string) *TileFetcher {
+func NewTileFetcher(tileProvider *TileProvider, cacheDir string) *TileFetcher {
 	t := new(TileFetcher)
-	t.urlSchema = urlSchema
-	t.cacheDir = cacheDir
+	t.tileProvider = tileProvider
+	t.cacheDir = fmt.Sprintf("%s/%s", cacheDir, t.tileProvider.Name)
 	return t
 }
 
 func (t *TileFetcher) url(zoom, x, y int) string {
-	return fmt.Sprintf(t.urlSchema, zoom, x, y)
+	shard := ""
+	ss := len(t.tileProvider.Shards)
+	if len(t.tileProvider.Shards) > 0 {
+		shard = t.tileProvider.Shards[(x+y)%ss]
+	}
+	return t.tileProvider.GetURL(shard, zoom, x, y)
 }
 
 func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
@@ -99,7 +104,7 @@ func (t *TileFetcher) createCacheDir() error {
 	src, err := os.Stat(t.cacheDir)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return os.Mkdir(t.cacheDir, 0777)
+			return os.MkdirAll(t.cacheDir, 0777)
 		}
 		return err
 	}

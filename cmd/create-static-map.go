@@ -6,6 +6,7 @@
 package main
 
 import (
+	"fmt"
 	"image/png"
 	"log"
 	"os"
@@ -20,6 +21,7 @@ func main() {
 		Width   int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
 		Height  int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
 		Output  string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
+		Type    string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
 		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
 		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
@@ -35,6 +37,21 @@ func main() {
 	}
 
 	m := staticmaps.NewMapCreator()
+
+	tileProviders := staticmaps.GetTileProviders()
+	if parser.FindOptionByLongName("type").IsSet() && (opts.Type == "list" || tileProviders[opts.Type] == nil) {
+		if opts.Type != "list" {
+			fmt.Println("Bad map type:", opts.Type)
+		}
+		fmt.Println("Possible map types (to be used with --type/-t):")
+		for k := range tileProviders {
+			fmt.Println(k)
+		}
+		os.Exit(0)
+	} else if parser.FindOptionByLongName("type").IsSet() {
+		m.SetTileProvider(tileProviders[opts.Type])
+	}
+
 	m.SetSize(opts.Width, opts.Height)
 
 	if parser.FindOptionByLongName("zoom").IsSet() {
@@ -59,6 +76,8 @@ func main() {
 			m.AddMarker(marker)
 		}
 	}
+
+	m.SetTileProvider(staticmaps.NewTileProviderThunderforestOutdoors())
 
 	img, err := m.Create()
 	if err != nil {

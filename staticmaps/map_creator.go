@@ -7,7 +7,6 @@ package staticmaps
 
 import (
 	"errors"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -30,6 +29,8 @@ type MapCreator struct {
 	center    s2.LatLng
 
 	markers []Marker
+
+	tileProvider *TileProvider
 }
 
 // NewMapCreator creates a new instance of MapCreator
@@ -39,7 +40,12 @@ func NewMapCreator() *MapCreator {
 	t.height = 512
 	t.hasZoom = false
 	t.hasCenter = false
+	t.tileProvider = NewTileProviderMapQuest()
 	return t
+}
+
+func (m *MapCreator) SetTileProvider(t *TileProvider) {
+	m.tileProvider = t
 }
 
 // SetSize sets the size of the generated image
@@ -99,7 +105,7 @@ func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 		return 15
 	}
 
-	tileSize := 256
+	tileSize := m.tileProvider.TileSize
 	margin := 16
 	w := float64(m.width-2*margin) / float64(tileSize)
 	h := float64(m.height-2*margin) / float64(tileSize)
@@ -138,23 +144,22 @@ func (m *MapCreator) Create() (image.Image, error) {
 	if !m.hasZoom {
 		zoom = m.determineZoom(bounds, center)
 	}
-	fmt.Println("zoom", zoom)
 
 	center_x, center_y := ll2xy(center, zoom)
 
-	tile_size := 256
-	ww := float64(m.width) / float64(tile_size)
-	hh := float64(m.height) / float64(tile_size)
+	tileSize := m.tileProvider.TileSize
+	ww := float64(m.width) / float64(tileSize)
+	hh := float64(m.height) / float64(tileSize)
 	imgTileOriginX := int(center_x - 0.5*ww)
 	imgTileOriginY := int(center_y - 0.5*hh)
 	tileCountX := 1 + int(center_x+0.5*ww) - imgTileOriginX
 	tileCountY := 1 + int(center_y+0.5*hh) - imgTileOriginY
 
-	imageWidth := tileCountX * tile_size
-	imageHeight := tileCountY * tile_size
+	imageWidth := tileCountX * tileSize
+	imageHeight := tileCountY * tileSize
 	img := image.NewRGBA(image.Rect(0, 0, imageWidth, imageHeight))
 
-	t := NewTileFetcher("http://otile1.mqcdn.com/tiles/1.0.0/osm/%[1]d/%[2]d/%[3]d.png", "cache")
+	t := NewTileFetcher(m.tileProvider, "cache")
 
 	bar := pb.StartNew(tileCountX * tileCountY).Prefix("Fetching tiles: ")
 	for xx := 0; xx < tileCountX; xx++ {
@@ -168,15 +173,15 @@ func (m *MapCreator) Create() (image.Image, error) {
 			tileImg, err := t.Fetch(zoom, x, y)
 
 			if err == nil {
-				rect := image.Rect(xx*tile_size, yy*tile_size, (xx+1)*tile_size, (yy+1)*tile_size)
+				rect := image.Rect(xx*tileSize, yy*tileSize, (xx+1)*tileSize, (yy+1)*tileSize)
 				draw.Draw(img, rect, tileImg, image.ZP, draw.Src)
 			}
 		}
 	}
 	bar.Finish()
 
-	imgCenterPixelX := int((center_x - float64(imgTileOriginX)) * float64(tile_size))
-	imgCenterPixelY := int((center_y - float64(imgTileOriginY)) * float64(tile_size))
+	imgCenterPixelX := int((center_x - float64(imgTileOriginX)) * float64(tileSize))
+	imgCenterPixelY := int((center_y - float64(imgTileOriginY)) * float64(tileSize))
 
 	gc := draw2dimg.NewGraphicContext(img)
 
@@ -185,8 +190,8 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
 		gc.SetFillColor(marker.Color)
 		x, y := ll2xy(marker.Position, zoom)
-		x = float64(imgCenterPixelX) + (x-center_x)*float64(tile_size)
-		y = float64(imgCenterPixelY) + (y-center_y)*float64(tile_size)
+		x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
+		y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize)
 		radius := 0.5 * marker.Size
 		gc.ArcTo(x, y, radius, radius, 0, 2*math.Pi)
 		gc.Close()
