@@ -7,6 +7,7 @@ package staticmaps
 
 import (
 	"errors"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -15,6 +16,7 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/golang/geo/s2"
 	"github.com/llgcode/draw2d/draw2dimg"
+	"github.com/mitchellh/go-homedir"
 )
 
 // MapCreator class
@@ -159,7 +161,13 @@ func (m *MapCreator) Create() (image.Image, error) {
 	imageHeight := tileCountY * tileSize
 	img := image.NewRGBA(image.Rect(0, 0, imageWidth, imageHeight))
 
-	t := NewTileFetcher(m.tileProvider, "cache")
+	t := NewTileFetcher(m.tileProvider)
+	cacheBaseDir, err := homedir.Expand("~/.cache/go-staticmaps")
+	if err == nil {
+		t.SetCacheBaseDir(cacheBaseDir)
+	} else {
+		fmt.Println("Unable to determine user's home directory => no caching of downloaded tiles")
+	}
 
 	bar := pb.StartNew(tileCountX * tileCountY).Prefix("Fetching tiles: ")
 	for xx := 0; xx < tileCountX; xx++ {

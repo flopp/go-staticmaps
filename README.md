@@ -4,11 +4,7 @@ Render static map images with go using OpenStreetMap tiles.
 
 ## Installation
 
-    go get -u github.com/flopp/go-staticmaps
-    go get -u github.com/cheggaaa/pb
-    go get -u github.com/llgcode/draw2d/draw2dimg
-    go get -u github.com/jessevdk/go-flags
-    go get -u github.com/golang/geo/s2
+    go get -u github.com/flopp/go-staticmaps/...
 
 ## Usage
 

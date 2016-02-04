@@ -19,14 +19,19 @@ import (
 
 type TileFetcher struct {
 	tileProvider *TileProvider
+	cacheBaseDir string
 	cacheDir     string
 }
 
-func NewTileFetcher(tileProvider *TileProvider, cacheDir string) *TileFetcher {
+func NewTileFetcher(tileProvider *TileProvider) *TileFetcher {
 	t := new(TileFetcher)
 	t.tileProvider = tileProvider
-	t.cacheDir = fmt.Sprintf("%s/%s", cacheDir, t.tileProvider.Name)
 	return t
+}
+
+func (t *TileFetcher) SetCacheBaseDir(d string) {
+	t.cacheBaseDir = d
+	t.cacheDir = fmt.Sprintf("%s/%s", t.cacheBaseDir, t.tileProvider.Name)
 }
 
 func (t *TileFetcher) url(zoom, x, y int) string {
@@ -43,10 +48,12 @@ func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
 }
 
 func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
-	fileName := t.cacheFileName(zoom, x, y)
-	cachedImg, err := t.loadCache(fileName)
-	if err == nil {
-		return cachedImg, nil
+	if t.cacheBaseDir != "" {
+		fileName := t.cacheFileName(zoom, x, y)
+		cachedImg, err := t.loadCache(fileName)
+		if err == nil {
+			return cachedImg, nil
+		}
 	}
 
 	url := t.url(zoom, x, y)
@@ -60,10 +67,13 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 		return nil, err
 	}
 
-	err = t.storeCache(fileName, data)
-	if err != nil {
-		fmt.Println("Failed to store image as", fileName)
-		fmt.Println(err)
+	if t.cacheBaseDir != "" {
+		fileName := t.cacheFileName(zoom, x, y)
+		err = t.storeCache(fileName, data)
+		if err != nil {
+			fmt.Println("Failed to store image as", fileName)
+			fmt.Println(err)
+		}
 	}
 
 	return img, nil
