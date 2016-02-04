@@ -77,8 +77,6 @@ func main() {
 		}
 	}
 
-	m.SetTileProvider(staticmaps.NewTileProviderThunderforestOutdoors())
-
 	img, err := m.Create()
 	if err != nil {
 		log.Fatal(err)

@@ -31,10 +31,10 @@ func NewTileProviderMapQuest() *TileProvider {
 
 func newTileProviderThunderforest(name string) *TileProvider {
 	t := new(TileProvider)
-	t.Name = fmt.Sprintf("thundeforest-%s", name)
+	t.Name = fmt.Sprintf("thunderforest-%s", name)
 	t.Attribution = "Maps © Thundeforest; Data © OSM and contributors, ODbL"
 	t.TileSize = 256
-	t.URLPattern = "https://%[1]s.tile.thunderforest.com/landscape/%[2]d/%[3]d/%[4]d.png"
+	t.URLPattern = "https://%[1]s.tile.thunderforest.com/" + name + "/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c"}
 	return t
 }
