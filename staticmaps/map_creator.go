@@ -191,9 +191,10 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.SetFillColor(marker.Color)
 		x, y := ll2xy(marker.Position, zoom)
 		x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
-		y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize)
+		y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize) - marker.Size
 		radius := 0.5 * marker.Size
-		gc.ArcTo(x, y, radius, radius, 0, 2*math.Pi)
+		gc.ArcTo(x, y, radius, radius, 150.0*math.Pi/180.0, 240.0*math.Pi/180.0)
+		gc.LineTo(x, y+marker.Size)
 		gc.Close()
 		gc.FillStroke()
 	}
