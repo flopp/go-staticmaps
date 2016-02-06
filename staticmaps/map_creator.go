@@ -11,10 +11,13 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"log"
 	"math"
 
 	"github.com/cheggaaa/pb"
+	"github.com/golang/freetype/truetype"
 	"github.com/golang/geo/s2"
+	"github.com/llgcode/draw2d"
 	"github.com/llgcode/draw2d/draw2dimg"
 	"github.com/mitchellh/go-homedir"
 )
@@ -70,15 +73,7 @@ func (m *MapCreator) SetCenter(center s2.LatLng) {
 
 // AddMarker adds a marker to the MapCreator
 func (m *MapCreator) AddMarker(marker Marker) {
-	n := len(m.markers)
-	if n == cap(m.markers) {
-		// Grow. We double its size and add 1, so if the size is zero we still grow.
-		newSlice := make([]Marker, n, 2*n+1)
-		copy(newSlice, m.markers)
-		m.markers = newSlice
-	}
-	m.markers = m.markers[0 : n+1]
-	m.markers[n] = marker
+	m.markers = append(m.markers, marker)
 }
 
 // ClearMarkers removes all markers from the MapCreator
@@ -128,6 +123,18 @@ func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 
 	return 15
+}
+
+func LoadFont() {
+	fontData, err := Asset("assets/luxisr.ttf")
+	if err != nil {
+		log.Panic(err)
+	}
+	font, err := truetype.Parse(fontData)
+	if err != nil {
+		log.Panic(err)
+	}
+	draw2d.RegisterFont(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
 }
 
 // Create actually creates the image
@@ -211,6 +218,24 @@ func (m *MapCreator) Create() (image.Image, error) {
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
 		img, image.Point{imgCenterPixelX - int(m.width)/2, imgCenterPixelY - int(m.height)/2},
 		draw.Src)
+
+	// draw attribution box
+	gc = draw2dimg.NewGraphicContext(croppedImg)
+
+	gc.SetFillColor(color.RGBA{0, 0, 0, 0x7f})
+	gc.MoveTo(0, float64(m.height)-14.0)
+	gc.LineTo(float64(m.width), float64(m.height)-14.0)
+	gc.LineTo(float64(m.width), float64(m.height))
+	gc.LineTo(0, float64(m.height))
+	gc.Close()
+	gc.Fill()
+
+	// draw attribution
+	gc.SetFontData(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal})
+	gc.SetStrokeColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	gc.SetFillColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	gc.SetFontSize(8)
+	gc.FillStringAt(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
 
 	return croppedImg, nil
 }
