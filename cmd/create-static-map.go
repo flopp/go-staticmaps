@@ -25,6 +25,7 @@ func main() {
 		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
 		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
+		Paths   []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -76,6 +77,14 @@ func main() {
 		for _, marker := range markers {
 			m.AddMarker(marker)
 		}
+	}
+
+	for _, pathString := range opts.Paths {
+		path, err := staticmaps.ParsePathString(pathString)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m.AddPath(path)
 	}
 
 	img, err := m.Create()

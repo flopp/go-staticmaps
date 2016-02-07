@@ -34,6 +34,7 @@ type MapCreator struct {
 	center    s2.LatLng
 
 	markers []Marker
+	paths   []Path
 
 	tileProvider *TileProvider
 }
@@ -78,7 +79,17 @@ func (m *MapCreator) AddMarker(marker Marker) {
 
 // ClearMarkers removes all markers from the MapCreator
 func (m *MapCreator) ClearMarkers() {
-	m.markers = m.markers[0:0]
+	m.markers = nil
+}
+
+// AddPath adds a path to the MapCreator
+func (m *MapCreator) AddPath(path Path) {
+	m.paths = append(m.paths, path)
+}
+
+// ClearPaths removes all paths from the MapCreator
+func (m *MapCreator) ClearPaths() {
+	m.paths = nil
 }
 
 func ll2xy(ll s2.LatLng, zoom int) (float64, float64) {
@@ -93,6 +104,12 @@ func (m *MapCreator) determineBounds() s2.Rect {
 	for _, marker := range m.markers {
 		r = r.AddPoint(marker.Position)
 	}
+	for _, path := range m.paths {
+		for _, position := range path.Positions {
+			r = r.AddPoint(position)
+		}
+	}
+
 	return r
 }
 
@@ -200,10 +217,39 @@ func (m *MapCreator) Create() (image.Image, error) {
 
 	gc := draw2dimg.NewGraphicContext(img)
 
+	for _, path := range m.paths {
+		if len(path.Positions) <= 1 {
+			break
+		}
+
+		gc.SetStrokeColor(path.Color)
+		gc.SetFillColor(path.FillColor)
+		gc.SetLineWidth(path.Weight)
+
+		for i, ll := range path.Positions {
+			x, y := ll2xy(ll, zoom)
+			x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
+			y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize)
+			if i == 0 {
+				gc.MoveTo(x, y)
+			} else {
+				gc.LineTo(x, y)
+			}
+		}
+
+		if path.IsFilled {
+			gc.Close()
+			gc.FillStroke()
+		} else {
+			gc.Stroke()
+		}
+	}
+
 	for i := range m.markers {
 		marker := m.markers[i]
 		gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
 		gc.SetFillColor(marker.Color)
+		gc.SetLineWidth(1.0)
 		x, y := ll2xy(marker.Position, zoom)
 		x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
 		y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize) - marker.Size
