@@ -26,9 +26,39 @@ Render static map images with go using OpenStreetMap tiles.
     Help Options:
       -h, --help               Show this help message
 
+### General
+The command line interface tries to resemble [Google's Static Maps API](https://developers.google.com/maps/documentation/static-maps/intro).
+If `--center` or `--zoom` are not given, *good* values are determined from the specified markers and paths.
+
+### Markers
+The `--marker` option defines one or more map markers of the same style. Use multiple `--marker` options to add markers of different styles.
+
+    --marker MARKER_STYLES|LATLNG|LATLNG|...
+
+`LATLNG` is a comma separated pair of latitude and longitude, e.g. `52.5153,13.3564`.
+
+`MARKER_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
+
+- `color:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
+- `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny` (default: `mid`)
+
+### Paths
+The `--path` option defines a path or an area on the map. Use multiple `--path` options to add multiple paths/areas to the map.
+
+    --path PATH_STYLES|LATLNG|LATLNG|...
+
+`PATH_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
+
+- `color:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
+- `fillcolor:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: none); if a fill color is specified, the path is drawn as a closed, filled area
+- `weight:WEIGHT` - where `WEIGHT` is the line width in pixels (defaut: `5`)
+
+
+## Examples
+
 ### Create a map of the Berlin Marathon
 
-    go run cmd/create-static-map.go --width 800 --height 600 \
+    create-static-map --width 800 --height 600 \
       --marker "color:green|52.5153,13.3564" \
       --marker "color:red|52.5160,13.3711" \
       --output "berlin-marathon.png" \
@@ -54,7 +84,7 @@ Render static map images with go using OpenStreetMap tiles.
 
 ### Create a map of the US capitals
 
-    go run cmd/create-static-map.go --width 800 --height 400 \
+    create-static-map --width 800 --height 400 \
       --output "us-capitals.png" \
       --marker "color:blue|size:tiny|32.3754,-86.2996|58.3637,-134.5721|33.4483,-112.0738|34.7244,-92.2789|\
         38.5737,-121.4871|39.7551,-104.9881|41.7665,-72.6732|39.1615,-75.5136|30.4382,-84.2806|33.7545,-84.3897|\
