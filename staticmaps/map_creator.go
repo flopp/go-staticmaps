@@ -11,8 +11,10 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"image/png"
 	"log"
 	"math"
+	"os"
 
 	"github.com/cheggaaa/pb"
 	"github.com/golang/freetype/truetype"
@@ -176,10 +178,10 @@ func (m *MapCreator) Create() (image.Image, error) {
 	tileSize := m.tileProvider.TileSize
 	ww := float64(m.width) / float64(tileSize)
 	hh := float64(m.height) / float64(tileSize)
-	imgTileOriginX := int(center_x - 0.5*ww)
-	imgTileOriginY := int(center_y - 0.5*hh)
-	tileCountX := 1 + int(center_x+0.5*ww) - imgTileOriginX
-	tileCountY := 1 + int(center_y+0.5*hh) - imgTileOriginY
+	imgTileOriginX := int(math.Floor(center_x - 0.5*ww))
+	imgTileOriginY := int(math.Floor(center_y - 0.5*hh))
+	tileCountX := 1 + int(math.Floor(center_x+0.5*ww)) - imgTileOriginX
+	tileCountY := 1 + int(math.Floor(center_y+0.5*hh)) - imgTileOriginY
 
 	imageWidth := tileCountX * tileSize
 	imageHeight := tileCountY * tileSize
@@ -259,6 +261,13 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.Close()
 		gc.FillStroke()
 	}
+
+	file, err := os.Create("intermediate.png")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	png.Encode(file, img)
 
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
