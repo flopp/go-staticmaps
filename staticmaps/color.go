@@ -19,7 +19,6 @@ func ParseColorString(s string) (*color.RGBA, error) {
 		r, errr := strconv.ParseUint("0x"+matches[1], 0, 8)
 		g, errg := strconv.ParseUint("0x"+matches[2], 0, 8)
 		b, errb := strconv.ParseUint("0x"+matches[3], 0, 8)
-		fmt.Println(r, g, b)
 		if errr != nil || errg != nil || errb != nil {
 			return nil, fmt.Errorf("Cannot parse hex RGB color string: %s", s)
 		}
@@ -33,7 +32,6 @@ func ParseColorString(s string) (*color.RGBA, error) {
 		g, errg := strconv.ParseUint("0x"+matches[2], 0, 8)
 		b, errb := strconv.ParseUint("0x"+matches[3], 0, 8)
 		a, erra := strconv.ParseUint("0x"+matches[4], 0, 8)
-		fmt.Println(r, g, b, a)
 		if errr != nil || errg != nil || errb != nil || erra != nil {
 			return nil, fmt.Errorf("Cannot parse hex RGBA color string: %s", s)
 		}

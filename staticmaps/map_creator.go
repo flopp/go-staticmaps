@@ -173,15 +173,15 @@ func (m *MapCreator) Create() (image.Image, error) {
 		zoom = m.determineZoom(bounds, center)
 	}
 
-	center_x, center_y := ll2xy(center, zoom)
+	centerX, centerY := ll2xy(center, zoom)
 
 	tileSize := m.tileProvider.TileSize
 	ww := float64(m.width) / float64(tileSize)
 	hh := float64(m.height) / float64(tileSize)
-	imgTileOriginX := int(math.Floor(center_x - 0.5*ww))
-	imgTileOriginY := int(math.Floor(center_y - 0.5*hh))
-	tileCountX := 1 + int(math.Floor(center_x+0.5*ww)) - imgTileOriginX
-	tileCountY := 1 + int(math.Floor(center_y+0.5*hh)) - imgTileOriginY
+	imgTileOriginX := int(math.Floor(centerX - 0.5*ww))
+	imgTileOriginY := int(math.Floor(centerY - 0.5*hh))
+	tileCountX := 1 + int(math.Floor(centerX+0.5*ww)) - imgTileOriginX
+	tileCountY := 1 + int(math.Floor(centerY+0.5*hh)) - imgTileOriginY
 
 	imageWidth := tileCountX * tileSize
 	imageHeight := tileCountY * tileSize
@@ -214,8 +214,8 @@ func (m *MapCreator) Create() (image.Image, error) {
 	}
 	bar.Finish()
 
-	imgCenterPixelX := int((center_x - float64(imgTileOriginX)) * float64(tileSize))
-	imgCenterPixelY := int((center_y - float64(imgTileOriginY)) * float64(tileSize))
+	imgCenterPixelX := int((centerX - float64(imgTileOriginX)) * float64(tileSize))
+	imgCenterPixelY := int((centerY - float64(imgTileOriginY)) * float64(tileSize))
 
 	gc := draw2dimg.NewGraphicContext(img)
 
@@ -225,14 +225,13 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 
 		gc.SetStrokeColor(path.Color)
-		fmt.Println(path.FillColor)
 		gc.SetFillColor(path.FillColor)
 		gc.SetLineWidth(path.Weight)
 
 		for i, ll := range path.Positions {
 			x, y := ll2xy(ll, zoom)
-			x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
-			y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize)
+			x = float64(imgCenterPixelX) + (x-centerX)*float64(tileSize)
+			y = float64(imgCenterPixelY) + (y-centerY)*float64(tileSize)
 			if i == 0 {
 				gc.MoveTo(x, y)
 			} else {
@@ -254,8 +253,8 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.SetFillColor(marker.Color)
 		gc.SetLineWidth(1.0)
 		x, y := ll2xy(marker.Position, zoom)
-		x = float64(imgCenterPixelX) + (x-center_x)*float64(tileSize)
-		y = float64(imgCenterPixelY) + (y-center_y)*float64(tileSize) - marker.Size
+		x = float64(imgCenterPixelX) + (x-centerX)*float64(tileSize)
+		y = float64(imgCenterPixelY) + (y-centerY)*float64(tileSize) - marker.Size
 		radius := 0.5 * marker.Size
 		gc.ArcTo(x, y, radius, radius, 150.0*math.Pi/180.0, 240.0*math.Pi/180.0)
 		gc.LineTo(x, y+marker.Size)
