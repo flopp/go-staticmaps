@@ -225,6 +225,7 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 
 		gc.SetStrokeColor(path.Color)
+		fmt.Println(path.FillColor)
 		gc.SetFillColor(path.FillColor)
 		gc.SetLineWidth(path.Weight)
 

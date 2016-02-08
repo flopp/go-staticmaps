@@ -39,7 +39,7 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 
 `MARKER_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
 
-- `color:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
+- `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
 - `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny` (default: `mid`)
 
 ### Paths
@@ -49,8 +49,8 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
 
 `PATH_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
 
-- `color:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
-- `fillcolor:COLOR` - where `COLOR` is either of the form `#RRGGBB`, `#RRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: none); if a fill color is specified, the path is drawn as a closed, filled area
+- `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
+- `fillcolor:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: none); if a fill color is specified, the path is drawn as a closed, filled area
 - `weight:WEIGHT` - where `WEIGHT` is the line width in pixels (defaut: `5`)
 
 
@@ -98,6 +98,17 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
 
 ![Static map of the US capitals](https://raw.githubusercontent.com/flopp/go-staticmaps/master/examples/us-capitals.png)
 
+### Create a map of Australia
+...where the Northern Territory is highlighted and the capital Canberra is marked.
+
+    create-static-map --width 800 --height 600 \
+      --center="-26.284973,134.303764" \
+      --output "australia.png" \
+      --marker "color:blue|-35.305200,149.121574" \
+      --path "color:0x00FF00|fillcolor:0x00FF007F|weight:2|-25.994024,129.013847|-25.994024,137.989677|-16.537670,138.011649|\
+        -14.834820,135.385917|-12.293236,137.033866|-11.174554,130.398124|-12.925791,130.167411|-14.866678,129.002860"
+
+![Static map of Australia](https://raw.githubusercontent.com/flopp/go-staticmaps/master/examples/australia.png)
 
 ## License
 Copyright 2016 Florian Pigorsch. All rights reserved.
