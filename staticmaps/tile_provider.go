@@ -51,18 +51,29 @@ func NewTileProviderThunderforestTransport() *TileProvider {
 	return newTileProviderThunderforest("transport")
 }
 
+func NewTileProviderStamenToner() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "stamen-toner"
+	t.Attribution = "Maps © Stamen; Data © OSM and contributors, ODbL"
+	t.TileSize = 256
+	t.URLPattern = "http://%[1]s.tile.stamen.com/toner/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c", "d"}
+	return t
+}
+
 func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
 
-	t1 := NewTileProviderMapQuest()
-	t2 := NewTileProviderThunderforestLandscape()
-	t3 := NewTileProviderThunderforestOutdoors()
-	t4 := NewTileProviderThunderforestTransport()
+	list := []*TileProvider{
+		NewTileProviderMapQuest(),
+		NewTileProviderThunderforestLandscape(),
+		NewTileProviderThunderforestOutdoors(),
+		NewTileProviderThunderforestTransport(),
+		NewTileProviderStamenToner()}
 
-	m[t1.Name] = t1
-	m[t2.Name] = t2
-	m[t3.Name] = t3
-	m[t4.Name] = t4
+	for _, tp := range list {
+		m[tp.Name] = tp
+	}
 
 	return m
 }

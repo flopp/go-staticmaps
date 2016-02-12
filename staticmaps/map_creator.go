@@ -11,10 +11,8 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"image/png"
 	"log"
 	"math"
-	"os"
 
 	"github.com/cheggaaa/pb"
 	"github.com/golang/freetype/truetype"
