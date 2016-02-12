@@ -35,7 +35,7 @@ func newTileProviderThunderforest(name string) *TileProvider {
 	t.Attribution = "Maps © Thundeforest; Data © OSM and contributors, ODbL"
 	t.TileSize = 256
 	t.URLPattern = "https://%[1]s.tile.thunderforest.com/" + name + "/%[2]d/%[3]d/%[4]d.png"
-	t.Shards = []string{"a"}
+	t.Shards = []string{"a", "b", "c"}
 	return t
 }
 
