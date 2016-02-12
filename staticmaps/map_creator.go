@@ -262,13 +262,6 @@ func (m *MapCreator) Create() (image.Image, error) {
 		gc.FillStroke()
 	}
 
-	file, err := os.Create("intermediate.png")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	png.Encode(file, img)
-
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
 		img, image.Point{imgCenterPixelX - int(m.width)/2, imgCenterPixelY - int(m.height)/2},
