@@ -10,6 +10,7 @@ import (
 	"image/color"
 	"strings"
 
+	"github.com/flopp/go-coordsparser"
 	"github.com/golang/geo/s2"
 )
 
@@ -53,11 +54,11 @@ func ParseMarkerString(s string) ([]Marker, error) {
 			}
 			size = size_
 		} else {
-			ll, err := ParseLatLngFromString(ss)
+			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
 				return nil, err
 			}
-			marker := Marker{ll, color, size}
+			marker := Marker{s2.LatLngFromDegrees(lat, lng), color, size}
 			markers = append(markers, marker)
 		}
 

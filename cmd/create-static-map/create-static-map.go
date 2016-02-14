@@ -12,7 +12,9 @@ import (
 	"os"
 
 	"github.com/flopp/go-staticmaps/staticmaps"
+    "github.com/flopp/go-coordsparser"
 	"github.com/jessevdk/go-flags"
+    "github.com/golang/geo/s2"
 )
 
 func main() {
@@ -61,9 +63,10 @@ func main() {
 	}
 
 	if parser.FindOptionByLongName("center").IsSet() {
-		center, err := staticmaps.ParseLatLngFromString(opts.Center)
+        lat, lng, err := coordsparser.Parse(opts.Center)
+        fmt.Println(opts.Center, lat, lng)
 		if err == nil {
-			m.SetCenter(center)
+			m.SetCenter(s2.LatLngFromDegrees(lat, lng))
 		} else {
 			log.Fatal(err)
 		}

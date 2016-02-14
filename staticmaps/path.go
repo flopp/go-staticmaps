@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/flopp/go-coordsparser"
 	"github.com/golang/geo/s2"
 )
 
@@ -45,11 +46,11 @@ func ParsePathString(s string) (Path, error) {
 			}
 			path.Weight = weight
 		} else {
-			ll, err := ParseLatLngFromString(ss)
+			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
 				return Path{}, err
 			}
-			path.Positions = append(path.Positions, ll)
+			path.Positions = append(path.Positions, s2.LatLngFromDegrees(lat, lng))
 		}
 
 	}
