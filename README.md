@@ -1,12 +1,33 @@
 # go-staticmaps
-Render static map images with go using OpenStreetMap tiles.
+A go (golang) library and command line tool to render static map images using OpenStreetMap tiles.
+
+## What?
+go-staticmaps is a golang library that allows you to create nice static map images from OpenStreetMap tiles, along with markers of different size and color, as well as paths and colored areas.
+
+go-staticmaps comes with a command line tool called `create-static-map` for use in shell scripts, etc.
+
+## How?
+
+### Installation
+
+Installing go-staticmaps is as easy as
+
+```bash
+go get -u github.com/flopp/go-staticmaps/...
+```
+
+### Library Usage
+
+The golang package can then be used through an
+
+```go
+import "github.com/flopp/go-staticmaps"
+```
+
+See the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/cmd/create-static-map/create-static-map.go) for an example how to use the package.
 
 
-## Installation
-
-    go get -u github.com/flopp/go-staticmaps/...
-
-## Usage
+### Command Line Usage
 
     Usage:
       create-static-map [OPTIONS]
