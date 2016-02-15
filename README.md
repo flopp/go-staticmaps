@@ -77,6 +77,34 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
 
 ## Examples
 
+### Basic Maps
+
+Centered at "N 52.514536 E 13.350151" with zoom level 10:
+
+```bash
+$ create-static-map --width 600 --height 400 -o map1.png -c "52.514536,13.350151" -z 10
+```
+![Example 1](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/map1.png)
+
+A map with a marker at "N 52.514536 E 13.350151" with zoom level 14 (no need to specify the map's center - it is automatically computed from the marker(s)):
+
+```bash
+$ create-static-map --width 600 --height 400 -o map2.png -z 14 -m "52.514536,13.350151"
+```
+
+![Example 2](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/map2.png)
+
+A map with two markers (red and green). If there are more than two markers in the map, a *good* zoom level can be determined automatically:
+
+```bash
+$ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.350151" -m "green|52.516285,13.377746"
+```
+
+![Example 3](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/map3.png)
+
+
+
+
 ### Create a map of the Berlin Marathon
 
     create-static-map --width 800 --height 600 \
