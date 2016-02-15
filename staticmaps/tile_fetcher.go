@@ -15,23 +15,23 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/Wessie/appdirs"
 )
 
 type TileFetcher struct {
 	tileProvider *TileProvider
-	cacheBaseDir string
 	cacheDir     string
+	useCaching   bool
 }
 
 func NewTileFetcher(tileProvider *TileProvider) *TileFetcher {
 	t := new(TileFetcher)
 	t.tileProvider = tileProvider
+	app := appdirs.New("go-staticmaps", "flopp.net", "0.1")
+	t.cacheDir = fmt.Sprintf("%s/%s", app.UserCache(), tileProvider.Name)
+	t.useCaching = true
 	return t
-}
-
-func (t *TileFetcher) SetCacheBaseDir(d string) {
-	t.cacheBaseDir = d
-	t.cacheDir = fmt.Sprintf("%s/%s", t.cacheBaseDir, t.tileProvider.Name)
 }
 
 func (t *TileFetcher) url(zoom, x, y int) string {
@@ -47,8 +47,12 @@ func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
 	return fmt.Sprintf("%s/%d-%d-%d", t.cacheDir, zoom, x, y)
 }
 
+func (t *TileFetcher) ToggleCaching(enabled bool) {
+	t.useCaching = enabled
+}
+
 func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
-	if t.cacheBaseDir != "" {
+	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)
 		cachedImg, err := t.loadCache(fileName)
 		if err == nil {
@@ -67,7 +71,7 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 		return nil, err
 	}
 
-	if t.cacheBaseDir != "" {
+	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)
 		err = t.storeCache(fileName, data)
 		if err != nil {
