@@ -19,6 +19,26 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
+var (
+	isFontLoaded = false
+)
+
+func loadFont() {
+	if !isFontLoaded {
+		isFontLoaded = true
+
+		fontData, err := Asset("assets/luxisr.ttf")
+		if err != nil {
+			log.Panic(err)
+		}
+		font, err := truetype.Parse(fontData)
+		if err != nil {
+			log.Panic(err)
+		}
+		draw2d.RegisterFont(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
+	}
+}
+
 // MapCreator class
 type MapCreator struct {
 	width  int
@@ -139,18 +159,6 @@ func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	return 15
 }
 
-func LoadFont() {
-	fontData, err := Asset("assets/luxisr.ttf")
-	if err != nil {
-		log.Panic(err)
-	}
-	font, err := truetype.Parse(fontData)
-	if err != nil {
-		log.Panic(err)
-	}
-	draw2d.RegisterFont(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
-}
-
 // Create actually creates the image
 func (m *MapCreator) Create() (image.Image, error) {
 	bounds := m.determineBounds()
@@ -265,6 +273,7 @@ func (m *MapCreator) Create() (image.Image, error) {
 	gc.Fill()
 
 	// draw attribution
+	loadFont()
 	gc.SetFontData(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal})
 	gc.SetStrokeColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	gc.SetFillColor(color.RGBA{0xff, 0xff, 0xff, 0xff})

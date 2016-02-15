@@ -39,7 +39,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	staticmaps.LoadFont()
 	m := staticmaps.NewMapCreator()
 
 	tileProviders := staticmaps.GetTileProviders()
