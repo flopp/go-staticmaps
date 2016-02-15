@@ -80,7 +80,7 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
         52.4998,13.3628|52.5040,13.3664|52.5053,13.3678|52.5084,13.3695|52.5096,13.3763|52.5096,13.3781|\
         52.5107,13.3928|52.5110,13.3968|52.5123,13.3934|52.5159,13.3929|52.5170,13.3907|52.5160,13.3711"
 
-![Static map of the Berlin Marathon](https://raw.githubusercontent.com/flopp/go-staticmaps/master/examples/berlin-marathon.png)
+![Static map of the Berlin Marathon](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/berlin-marathon.png)
 
 ### Create a map of the US capitals
 
@@ -96,7 +96,7 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
         44.3776,-100.3177|36.1589,-86.7821|30.2687,-97.7452|40.7716,-111.8882|44.2627,-72.5716|37.5408,-77.4339|\
         47.0449,-122.9016|38.3533,-81.6354|43.0632,-89.4007|41.1389,-104.8165"
 
-![Static map of the US capitals](https://raw.githubusercontent.com/flopp/go-staticmaps/master/examples/us-capitals.png)
+![Static map of the US capitals](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/us-capitals.png)
 
 ### Create a map of Australia
 ...where the Northern Territory is highlighted and the capital Canberra is marked.
@@ -108,7 +108,7 @@ The `--path` option defines a path or an area on the map. Use multiple `--path` 
       --path "color:0x00FF00|fillcolor:0x00FF007F|weight:2|-25.994024,129.013847|-25.994024,137.989677|-16.537670,138.011649|\
         -14.834820,135.385917|-12.293236,137.033866|-11.174554,130.398124|-12.925791,130.167411|-14.866678,129.002860"
 
-![Static map of Australia](https://raw.githubusercontent.com/flopp/go-staticmaps/master/examples/australia.png)
+![Static map of Australia](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/australia.png)
 
 ## License
 Copyright 2016 Florian Pigorsch. All rights reserved.
