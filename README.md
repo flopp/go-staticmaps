@@ -6,6 +6,8 @@ go-staticmaps is a golang library that allows you to create nice static map imag
 
 go-staticmaps comes with a command line tool called `create-static-map` for use in shell scripts, etc.
 
+![Static map of the Berlin Marathon](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/berlin-marathon.png)
+
 ## How?
 
 ### Installation
