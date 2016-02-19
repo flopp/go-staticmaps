@@ -9,11 +9,14 @@ import (
 	"fmt"
 	"image/color"
 	"regexp"
+	"strings"
 )
 
 // ParseColorString parses hex color strings (i.e. `0xRRGGBB`, `#RRGGBB`, `0xRRGGBBAA`, `#RRGGBBAA`), and names colors (e.g. 'black', 'blue', ...)
 func ParseColorString(s string) (*color.RGBA, error) {
-	re := regexp.MustCompile(`^\s*(0x|#)([A-Fa-f0-9]{6})\s*$`)
+	s = strings.ToLower(strings.TrimSpace(s))
+
+	re := regexp.MustCompile(`^(0x|#)([A-Fa-f0-9]{6})$`)
 	matches := re.FindStringSubmatch(s)
 	if matches != nil {
 		var r, g, b int
@@ -21,7 +24,7 @@ func ParseColorString(s string) (*color.RGBA, error) {
 		return &color.RGBA{uint8(r), uint8(g), uint8(b), 0xff}, nil
 	}
 
-	re = regexp.MustCompile(`^\s*(0x|#)([A-Fa-f0-9]{8})\s*$`)
+	re = regexp.MustCompile(`^(0x|#)([A-Fa-f0-9]{8})$`)
 	matches = re.FindStringSubmatch(s)
 	if matches != nil {
 		var r, g, b, a int
