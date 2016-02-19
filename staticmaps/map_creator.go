@@ -27,10 +27,13 @@ func loadFont() {
 	if !isFontLoaded {
 		isFontLoaded = true
 
-		fontData, err := Asset("assets/luxisr.ttf")
-		if err != nil {
-			log.Panic(err)
-		}
+		/*
+			fontData, err := Asset("assets/luxisr.ttf")
+			if err != nil {
+				log.Panic(err)
+			}
+		*/
+		fontData := AssetLuxiSR
 		font, err := truetype.Parse(fontData)
 		if err != nil {
 			log.Panic(err)
