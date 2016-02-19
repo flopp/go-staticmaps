@@ -10,6 +10,7 @@ import (
 	"image/png"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/flopp/go-coordsparser"
 	"github.com/flopp/go-staticmaps/staticmaps"
@@ -47,7 +48,13 @@ func main() {
 			fmt.Println("Bad map type:", opts.Type)
 		}
 		fmt.Println("Possible map types (to be used with --type/-t):")
+		// print sorted keys
+		keys := make([]string, 0, len(tileProviders))
 		for k := range tileProviders {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
 			fmt.Println(k)
 		}
 		os.Exit(0)
