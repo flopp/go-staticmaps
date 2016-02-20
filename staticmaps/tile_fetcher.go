@@ -47,10 +47,12 @@ func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
 	return fmt.Sprintf("%s/%d-%d-%d", t.cacheDir, zoom, x, y)
 }
 
+// ToggleCaching enables/disables caching
 func (t *TileFetcher) ToggleCaching(enabled bool) {
 	t.useCaching = enabled
 }
 
+// Fetch download (or retrieves from the cache) a tile image for the specified zoom level and tile coordinates
 func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)

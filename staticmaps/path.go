@@ -15,6 +15,7 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
+// Path represents a path or area on the map
 type Path struct {
 	Positions []s2.LatLng
 	Color     color.RGBA

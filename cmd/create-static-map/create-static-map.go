@@ -18,6 +18,31 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+func getTileProviderOrExit(name string) *staticmaps.TileProvider {
+	tileProviders := staticmaps.GetTileProviders()
+	tp := tileProviders[name]
+	if tp != nil {
+		return tp
+	}
+
+	if name != "list" {
+		fmt.Println("Bad map type:", name)
+	}
+	fmt.Println("Possible map types (to be used with --type/-t):")
+	// print sorted keys
+	keys := make([]string, 0, len(tileProviders))
+	for k := range tileProviders {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println(k)
+	}
+	os.Exit(0)
+
+	return nil
+}
+
 func main() {
 	var opts struct {
 		//		ClearCache bool     `long:"clear-cache" description:"Clears the tile cache"`
@@ -42,24 +67,9 @@ func main() {
 
 	m := staticmaps.NewMapCreator()
 
-	tileProviders := staticmaps.GetTileProviders()
-	if parser.FindOptionByLongName("type").IsSet() && (opts.Type == "list" || tileProviders[opts.Type] == nil) {
-		if opts.Type != "list" {
-			fmt.Println("Bad map type:", opts.Type)
-		}
-		fmt.Println("Possible map types (to be used with --type/-t):")
-		// print sorted keys
-		keys := make([]string, 0, len(tileProviders))
-		for k := range tileProviders {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			fmt.Println(k)
-		}
-		os.Exit(0)
-	} else if parser.FindOptionByLongName("type").IsSet() {
-		m.SetTileProvider(tileProviders[opts.Type])
+	tp := getTileProviderOrExit(opts.Type)
+	if tp != nil {
+		m.SetTileProvider(tp)
 	}
 
 	m.SetSize(opts.Width, opts.Height)
@@ -70,10 +80,10 @@ func main() {
 
 	if parser.FindOptionByLongName("center").IsSet() {
 		lat, lng, err := coordsparser.Parse(opts.Center)
-		if err == nil {
-			m.SetCenter(s2.LatLngFromDegrees(lat, lng))
-		} else {
+		if err != nil {
 			log.Fatal(err)
+		} else {
+			m.SetCenter(s2.LatLngFromDegrees(lat, lng))
 		}
 	}
 
@@ -81,9 +91,10 @@ func main() {
 		markers, err := staticmaps.ParseMarkerString(markerString)
 		if err != nil {
 			log.Fatal(err)
-		}
-		for _, marker := range markers {
-			m.AddMarker(marker)
+		} else {
+			for _, marker := range markers {
+				m.AddMarker(marker)
+			}
 		}
 	}
 
@@ -91,8 +102,9 @@ func main() {
 		path, err := staticmaps.ParsePathString(pathString)
 		if err != nil {
 			log.Fatal(err)
+		} else {
+			m.AddPath(path)
 		}
-		m.AddPath(path)
 	}
 
 	img, err := m.Create()

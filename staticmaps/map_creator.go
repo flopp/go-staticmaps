@@ -242,8 +242,8 @@ func (m *MapCreator) Create() (image.Image, error) {
 		path.draw(gc, trans)
 	}
 
-	for i := range m.markers {
-		m.markers[i].draw(gc, trans)
+	for _, marker := range m.markers {
+		marker.draw(gc, trans)
 	}
 
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))

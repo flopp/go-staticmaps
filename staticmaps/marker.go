@@ -16,6 +16,7 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 )
 
+// Marker represents a marker on the map
 type Marker struct {
 	Position s2.LatLng
 	Color    color.RGBA
