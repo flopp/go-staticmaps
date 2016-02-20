@@ -51,11 +51,11 @@ func ParseMarkerString(s string) ([]Marker, error) {
 		} else if strings.HasPrefix(ss, "label:") {
 			// TODO
 		} else if strings.HasPrefix(ss, "size:") {
-			size_, err := parseSizeString(strings.TrimPrefix(ss, "size:"))
+			var err error
+			size, err = parseSizeString(strings.TrimPrefix(ss, "size:"))
 			if err != nil {
 				return nil, err
 			}
-			size = size_
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {

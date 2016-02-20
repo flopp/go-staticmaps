@@ -3,6 +3,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
+// Package staticmaps renders static map images from OSM tiles with markers, paths, and filled areas.
 package staticmaps
 
 import (

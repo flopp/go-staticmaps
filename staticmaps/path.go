@@ -24,6 +24,7 @@ type Path struct {
 	Weight    float64
 }
 
+// ParsePathString parses a string and returns a path
 func ParsePathString(s string) (Path, error) {
 	path := Path{Positions: nil, Color: color.RGBA{0xff, 0, 0, 0xff}, IsFilled: false, FillColor: color.RGBA{}, Weight: 5.0}
 

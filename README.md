@@ -167,7 +167,7 @@ $ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.35
 ## Acknowledgements
 Besides the go standard library, go-staticmaps uses
 
-- MapQuest (https://developer.mapquest.com/) and Thunderforest (http://www.thunderforest.com/) as map tile providers
+- MapQuest (https://developer.mapquest.com/), Thunderforest (http://www.thunderforest.com/), and Stamen (http://maps.stamen.com/) as map tile providers
 - Go Graphics (https://github.com/fogleman/gg) for 2D drawing
 - S2 geometry library (https://github.com/golang/geo) for spherical geometry calculations
 - appdirs (https://github.com/Wessie/appdirs) for platform specific system directories

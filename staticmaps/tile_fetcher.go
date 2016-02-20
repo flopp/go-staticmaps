@@ -25,6 +25,7 @@ type TileFetcher struct {
 	useCaching   bool
 }
 
+// NewTileFetcher creates a new Tilefetcher struct
 func NewTileFetcher(tileProvider *TileProvider) *TileFetcher {
 	t := new(TileFetcher)
 	t.tileProvider = tileProvider
