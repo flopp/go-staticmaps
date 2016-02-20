@@ -8,10 +8,12 @@ package staticmaps
 import (
 	"fmt"
 	"image/color"
+	"math"
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
 	"github.com/golang/geo/s2"
+	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 type Marker struct {
@@ -20,7 +22,7 @@ type Marker struct {
 	Size     float64
 }
 
-func ParseSizeString(s string) (float64, error) {
+func parseSizeString(s string) (float64, error) {
 	if s == "mid" {
 		return 16.0, nil
 	} else if s == "small" {
@@ -40,15 +42,15 @@ func ParseMarkerString(s string) ([]Marker, error) {
 
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
-			color_, err := ParseColorString(strings.TrimPrefix(ss, "color:"))
+			var err error
+			color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
 			if err != nil {
 				return nil, err
 			}
-			color = *color_
 		} else if strings.HasPrefix(ss, "label:") {
 			// TODO
 		} else if strings.HasPrefix(ss, "size:") {
-			size_, err := ParseSizeString(strings.TrimPrefix(ss, "size:"))
+			size_, err := parseSizeString(strings.TrimPrefix(ss, "size:"))
 			if err != nil {
 				return nil, err
 			}
@@ -61,7 +63,18 @@ func ParseMarkerString(s string) ([]Marker, error) {
 			marker := Marker{s2.LatLngFromDegrees(lat, lng), color, size}
 			markers = append(markers, marker)
 		}
-
 	}
 	return markers, nil
+}
+
+func (m *Marker) draw(gc *draw2dimg.GraphicContext, trans *transformer) {
+	gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
+	gc.SetFillColor(m.Color)
+	gc.SetLineWidth(1.0)
+	radius := 0.5 * m.Size
+	x, y := trans.ll2p(m.Position)
+	gc.ArcTo(x, y-m.Size, radius, radius, 150.0*math.Pi/180.0, 240.0*math.Pi/180.0)
+	gc.LineTo(x, y)
+	gc.Close()
+	gc.FillStroke()
 }

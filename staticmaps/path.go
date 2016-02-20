@@ -12,6 +12,7 @@ import (
 
 	"github.com/flopp/go-coordsparser"
 	"github.com/golang/geo/s2"
+	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 type Path struct {
@@ -27,24 +28,24 @@ func ParsePathString(s string) (Path, error) {
 
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
-			color, err := ParseColorString(strings.TrimPrefix(ss, "color:"))
+			var err error
+			path.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
 			if err != nil {
 				return Path{}, err
 			}
-			path.Color = *color
 		} else if strings.HasPrefix(ss, "fillcolor:") {
-			color, err := ParseColorString(strings.TrimPrefix(ss, "fillcolor:"))
-			if err != nil {
-				return Path{}, err
-			}
-			path.FillColor = *color
 			path.IsFilled = true
-		} else if strings.HasPrefix(ss, "weight:") {
-			weight, err := strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
+			var err error
+			path.FillColor, err = ParseColorString(strings.TrimPrefix(ss, "fillcolor:"))
 			if err != nil {
 				return Path{}, err
 			}
-			path.Weight = weight
+		} else if strings.HasPrefix(ss, "weight:") {
+			var err error
+			path.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
+			if err != nil {
+				return Path{}, err
+			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
@@ -55,4 +56,26 @@ func ParsePathString(s string) (Path, error) {
 
 	}
 	return path, nil
+}
+
+func (p *Path) draw(gc *draw2dimg.GraphicContext, trans *transformer) {
+	if len(p.Positions) <= 1 {
+		return
+	}
+
+	gc.SetStrokeColor(p.Color)
+	gc.SetFillColor(p.FillColor)
+	gc.SetLineWidth(p.Weight)
+
+	gc.MoveTo(trans.ll2p(p.Positions[0]))
+	for _, ll := range p.Positions[1:] {
+		gc.LineTo(trans.ll2p(ll))
+	}
+
+	if p.IsFilled {
+		gc.Close()
+		gc.FillStroke()
+	} else {
+		gc.Stroke()
+	}
 }

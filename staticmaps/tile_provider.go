@@ -61,6 +61,7 @@ func NewTileProviderStamenToner() *TileProvider {
 	return t
 }
 
+// GetTileProviders returns a map of all available TileProviders
 func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
 

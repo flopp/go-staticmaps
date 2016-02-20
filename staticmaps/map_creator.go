@@ -27,18 +27,11 @@ func loadFont() {
 	if !isFontLoaded {
 		isFontLoaded = true
 
-		/*
-			fontData, err := Asset("assets/luxisr.ttf")
-			if err != nil {
-				log.Panic(err)
-			}
-		*/
-		fontData := AssetLuxiSR
-		font, err := truetype.Parse(fontData)
+		font, err := truetype.Parse(ttfFontData)
 		if err != nil {
 			log.Panic(err)
 		}
-		draw2d.RegisterFont(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
+		draw2d.RegisterFont(draw2d.FontData{Name: "font", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
 	}
 }
 
@@ -70,6 +63,7 @@ func NewMapCreator() *MapCreator {
 	return t
 }
 
+// SetTileProvider sets the TileProvider to be used
 func (m *MapCreator) SetTileProvider(t *TileProvider) {
 	m.tileProvider = t
 }
@@ -110,13 +104,6 @@ func (m *MapCreator) AddPath(path Path) {
 // ClearPaths removes all paths from the MapCreator
 func (m *MapCreator) ClearPaths() {
 	m.paths = nil
-}
-
-func ll2xy(ll s2.LatLng, zoom int) (float64, float64) {
-	tiles := math.Exp2(float64(zoom))
-	x := tiles * (ll.Lng.Degrees() + 180.0) / 360.0
-	y := tiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
-	return x, y
 }
 
 func (m *MapCreator) determineBounds() s2.Rect {
@@ -162,6 +149,54 @@ func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	return 15
 }
 
+type transformer struct {
+	zoom               int
+	tileSize           int
+	pWidth, pHeight    int
+	pCenterX, pCenterY int
+	tCountX, tCountY   int
+	tCenterX, tCenterY float64
+	tOriginX, tOriginY int
+}
+
+func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSize int) *transformer {
+	t := new(transformer)
+	t.zoom = zoom
+	t.tileSize = tileSize
+	t.tCenterX, t.tCenterY = t.ll2t(llCenter)
+
+	ww := float64(width) / float64(tileSize)
+	hh := float64(height) / float64(tileSize)
+
+	t.tOriginX = int(math.Floor(t.tCenterX - 0.5*ww))
+	t.tOriginY = int(math.Floor(t.tCenterY - 0.5*hh))
+
+	t.tCountX = 1 + int(math.Floor(t.tCenterX+0.5*ww)) - t.tOriginX
+	t.tCountY = 1 + int(math.Floor(t.tCenterY+0.5*hh)) - t.tOriginY
+
+	t.pWidth = t.tCountX * tileSize
+	t.pHeight = t.tCountY * tileSize
+
+	t.pCenterX = int((t.tCenterX - float64(t.tOriginX)) * float64(tileSize))
+	t.pCenterY = int((t.tCenterY - float64(t.tOriginY)) * float64(tileSize))
+
+	return t
+}
+
+func (t *transformer) ll2t(ll s2.LatLng) (float64, float64) {
+	tiles := math.Exp2(float64(t.zoom))
+	x := tiles * (ll.Lng.Degrees() + 180.0) / 360.0
+	y := tiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
+	return x, y
+}
+
+func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
+	x, y := t.ll2t(ll)
+	x = float64(t.pCenterX) + (x-t.tCenterX)*float64(t.tileSize)
+	y = float64(t.pCenterY) + (y-t.tCenterY)*float64(t.tileSize)
+	return x, y
+}
+
 // Create actually creates the image
 func (m *MapCreator) Create() (image.Image, error) {
 	bounds := m.determineBounds()
@@ -179,29 +214,19 @@ func (m *MapCreator) Create() (image.Image, error) {
 		zoom = m.determineZoom(bounds, center)
 	}
 
-	centerX, centerY := ll2xy(center, zoom)
-
 	tileSize := m.tileProvider.TileSize
-	ww := float64(m.width) / float64(tileSize)
-	hh := float64(m.height) / float64(tileSize)
-	imgTileOriginX := int(math.Floor(centerX - 0.5*ww))
-	imgTileOriginY := int(math.Floor(centerY - 0.5*hh))
-	tileCountX := 1 + int(math.Floor(centerX+0.5*ww)) - imgTileOriginX
-	tileCountY := 1 + int(math.Floor(centerY+0.5*hh)) - imgTileOriginY
+	trans := newTransformer(m.width, m.height, zoom, center, tileSize)
+	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 
-	imageWidth := tileCountX * tileSize
-	imageHeight := tileCountY * tileSize
-	img := image.NewRGBA(image.Rect(0, 0, imageWidth, imageHeight))
-
+	// fetch and draw tiles to img
 	t := NewTileFetcher(m.tileProvider)
-
-	for xx := 0; xx < tileCountX; xx++ {
-		x := imgTileOriginX + xx
+	for xx := 0; xx < trans.tCountX; xx++ {
+		x := trans.tOriginX + xx
 		if x < 0 {
 			x = x + (1 << uint(zoom))
 		}
-		for yy := 0; yy < tileCountY; yy++ {
-			y := imgTileOriginY + yy
+		for yy := 0; yy < trans.tCountY; yy++ {
+			y := trans.tOriginY + yy
 			tileImg, err := t.Fetch(zoom, x, y)
 
 			if err == nil {
@@ -211,57 +236,19 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 	}
 
-	imgCenterPixelX := int((centerX - float64(imgTileOriginX)) * float64(tileSize))
-	imgCenterPixelY := int((centerY - float64(imgTileOriginY)) * float64(tileSize))
-
 	gc := draw2dimg.NewGraphicContext(img)
 
 	for _, path := range m.paths {
-		if len(path.Positions) <= 1 {
-			break
-		}
-
-		gc.SetStrokeColor(path.Color)
-		gc.SetFillColor(path.FillColor)
-		gc.SetLineWidth(path.Weight)
-
-		for i, ll := range path.Positions {
-			x, y := ll2xy(ll, zoom)
-			x = float64(imgCenterPixelX) + (x-centerX)*float64(tileSize)
-			y = float64(imgCenterPixelY) + (y-centerY)*float64(tileSize)
-			if i == 0 {
-				gc.MoveTo(x, y)
-			} else {
-				gc.LineTo(x, y)
-			}
-		}
-
-		if path.IsFilled {
-			gc.Close()
-			gc.FillStroke()
-		} else {
-			gc.Stroke()
-		}
+		path.draw(gc, trans)
 	}
 
 	for i := range m.markers {
-		marker := m.markers[i]
-		gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
-		gc.SetFillColor(marker.Color)
-		gc.SetLineWidth(1.0)
-		x, y := ll2xy(marker.Position, zoom)
-		x = float64(imgCenterPixelX) + (x-centerX)*float64(tileSize)
-		y = float64(imgCenterPixelY) + (y-centerY)*float64(tileSize) - marker.Size
-		radius := 0.5 * marker.Size
-		gc.ArcTo(x, y, radius, radius, 150.0*math.Pi/180.0, 240.0*math.Pi/180.0)
-		gc.LineTo(x, y+marker.Size)
-		gc.Close()
-		gc.FillStroke()
+		m.markers[i].draw(gc, trans)
 	}
 
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
-		img, image.Point{imgCenterPixelX - int(m.width)/2, imgCenterPixelY - int(m.height)/2},
+		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
 	// draw attribution box
@@ -277,7 +264,7 @@ func (m *MapCreator) Create() (image.Image, error) {
 
 	// draw attribution
 	loadFont()
-	gc.SetFontData(draw2d.FontData{Name: "luxi", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal})
+	gc.SetFontData(draw2d.FontData{Name: "font", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal})
 	gc.SetStrokeColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	gc.SetFillColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	gc.SetFontSize(8)
