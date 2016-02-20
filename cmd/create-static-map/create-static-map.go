@@ -67,9 +67,11 @@ func main() {
 
 	m := staticmaps.NewMapCreator()
 
-	tp := getTileProviderOrExit(opts.Type)
-	if tp != nil {
-		m.SetTileProvider(tp)
+	if parser.FindOptionByLongName("type").IsSet() {
+		tp := getTileProviderOrExit(opts.Type)
+		if tp != nil {
+			m.SetTileProvider(tp)
+		}
 	}
 
 	m.SetSize(opts.Width, opts.Height)

@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
+	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
-	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 // Marker represents a marker on the map
@@ -68,14 +68,19 @@ func ParseMarkerString(s string) ([]Marker, error) {
 	return markers, nil
 }
 
-func (m *Marker) draw(gc *draw2dimg.GraphicContext, trans *transformer) {
-	gc.SetStrokeColor(color.RGBA{0, 0, 0, 0xff})
-	gc.SetFillColor(m.Color)
-	gc.SetLineWidth(1.0)
+func (m *Marker) draw(dc *gg.Context, trans *transformer) {
+	dc.ClearPath()
+
+	dc.SetLineJoin(gg.LineJoinRound)
+	dc.SetLineWidth(1.0)
+
 	radius := 0.5 * m.Size
 	x, y := trans.ll2p(m.Position)
-	gc.ArcTo(x, y-m.Size, radius, radius, 150.0*math.Pi/180.0, 240.0*math.Pi/180.0)
-	gc.LineTo(x, y)
-	gc.Close()
-	gc.FillStroke()
+	dc.DrawArc(x, y-m.Size, radius, (90.0+60.0)*math.Pi/180.0, (360.0+90.0-60.0)*math.Pi/180.0)
+	dc.LineTo(x, y)
+	dc.ClosePath()
+	dc.SetColor(m.Color)
+	dc.FillPreserve()
+	dc.SetRGB(0, 0, 0)
+	dc.Stroke()
 }

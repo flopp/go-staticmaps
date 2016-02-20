@@ -8,32 +8,12 @@ package staticmaps
 import (
 	"errors"
 	"image"
-	"image/color"
 	"image/draw"
-	"log"
 	"math"
 
-	"github.com/golang/freetype/truetype"
+	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
-	"github.com/llgcode/draw2d"
-	"github.com/llgcode/draw2d/draw2dimg"
 )
-
-var (
-	isFontLoaded = false
-)
-
-func loadFont() {
-	if !isFontLoaded {
-		isFontLoaded = true
-
-		font, err := truetype.Parse(ttfFontData)
-		if err != nil {
-			log.Panic(err)
-		}
-		draw2d.RegisterFont(draw2d.FontData{Name: "font", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal}, font)
-	}
-}
 
 // MapCreator class
 type MapCreator struct {
@@ -236,39 +216,29 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 	}
 
-	gc := draw2dimg.NewGraphicContext(img)
+	dc := gg.NewContextForRGBA(img)
 
 	for _, path := range m.paths {
-		path.draw(gc, trans)
+		path.draw(dc, trans)
 	}
 
 	for _, marker := range m.markers {
-		marker.draw(gc, trans)
+		marker.draw(dc, trans)
 	}
-
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
-	// draw attribution box
-	gc = draw2dimg.NewGraphicContext(croppedImg)
-
-	gc.SetFillColor(color.RGBA{0, 0, 0, 0x7f})
-	gc.MoveTo(0, float64(m.height)-14.0)
-	gc.LineTo(float64(m.width), float64(m.height)-14.0)
-	gc.LineTo(float64(m.width), float64(m.height))
-	gc.LineTo(0, float64(m.height))
-	gc.Close()
-	gc.Fill()
-
 	// draw attribution
-	loadFont()
-	gc.SetFontData(draw2d.FontData{Name: "font", Family: draw2d.FontFamilySans, Style: draw2d.FontStyleNormal})
-	gc.SetStrokeColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	gc.SetFillColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	gc.SetFontSize(8)
-	gc.FillStringAt(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
+	_, textHeight := dc.MeasureString(m.tileProvider.Attribution)
+	boxHeight := textHeight + 4.0
+	dc = gg.NewContextForRGBA(croppedImg)
+	dc.SetRGBA(0.0, 0.0, 0.0, 0.5)
+	dc.DrawRectangle(0.0, float64(m.height)-boxHeight, float64(m.width), boxHeight)
+	dc.Fill()
+	dc.SetRGBA(1.0, 1.0, 1.0, 0.75)
+	dc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
 
 	return croppedImg, nil
 }

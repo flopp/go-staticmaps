@@ -164,6 +164,15 @@ $ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.35
 
 ![Static map of Australia](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/australia.png)
 
+## Acknowledgements
+Besides the go standard library, go-staticmaps uses
+
+- MapQuest (https://developer.mapquest.com/) and Thunderforest (http://www.thunderforest.com/) as map tile providers
+- Go Graphics (https://github.com/fogleman/gg) for 2D drawing
+- S2 geometry library (https://github.com/golang/geo) for spherical geometry calculations
+- appdirs (https://github.com/Wessie/appdirs) for platform specific system directories
+- go-coordsparser (https://github.com/flopp/go-coordsparser) for parsing geo coordinates
+
 ## License
 Copyright 2016 Florian Pigorsch. All rights reserved.
 

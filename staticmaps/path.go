@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
+	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
-	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 // Path represents a path or area on the map
@@ -59,24 +59,29 @@ func ParsePathString(s string) (Path, error) {
 	return path, nil
 }
 
-func (p *Path) draw(gc *draw2dimg.GraphicContext, trans *transformer) {
+func (p *Path) draw(dc *gg.Context, trans *transformer) {
 	if len(p.Positions) <= 1 {
 		return
 	}
 
-	gc.SetStrokeColor(p.Color)
-	gc.SetFillColor(p.FillColor)
-	gc.SetLineWidth(p.Weight)
+	dc.ClearPath()
 
-	gc.MoveTo(trans.ll2p(p.Positions[0]))
-	for _, ll := range p.Positions[1:] {
-		gc.LineTo(trans.ll2p(ll))
+	dc.SetLineWidth(p.Weight)
+	dc.SetLineCap(gg.LineCapRound)
+	dc.SetLineJoin(gg.LineJoinRound)
+
+	for _, ll := range p.Positions {
+		dc.LineTo(trans.ll2p(ll))
 	}
 
 	if p.IsFilled {
-		gc.Close()
-		gc.FillStroke()
+		dc.ClosePath()
+		dc.SetColor(p.FillColor)
+		dc.FillPreserve()
+		dc.SetColor(p.Color)
+		dc.Stroke()
 	} else {
-		gc.Stroke()
+		dc.SetColor(p.Color)
+		dc.Stroke()
 	}
 }

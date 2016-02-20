@@ -22,7 +22,7 @@ func (t *TileProvider) GetURL(shard string, zoom, x, y int) string {
 func NewTileProviderMapQuest() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "mapquest"
-	t.Attribution = "Maps © MapQuest; Data © OSM and contributors, ODbL"
+	t.Attribution = "Maps (c) MapQuest; Data (c) OSM and contributors, ODbL"
 	t.TileSize = 256
 	t.URLPattern = "http://otile%[1]s.mqcdn.com/tiles/1.0.0/osm/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"1", "2", "3", "4"}
@@ -32,7 +32,7 @@ func NewTileProviderMapQuest() *TileProvider {
 func newTileProviderThunderforest(name string) *TileProvider {
 	t := new(TileProvider)
 	t.Name = fmt.Sprintf("thunderforest-%s", name)
-	t.Attribution = "Maps © Thundeforest; Data © OSM and contributors, ODbL"
+	t.Attribution = "Maps (c) Thundeforest; Data (c) OSM and contributors, ODbL"
 	t.TileSize = 256
 	t.URLPattern = "https://%[1]s.tile.thunderforest.com/" + name + "/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c"}
@@ -54,7 +54,7 @@ func NewTileProviderThunderforestTransport() *TileProvider {
 func NewTileProviderStamenToner() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "stamen-toner"
-	t.Attribution = "Maps © Stamen; Data © OSM and contributors, ODbL"
+	t.Attribution = "Maps (c) Stamen; Data (c) OSM and contributors, ODbL"
 	t.TileSize = 256
 	t.URLPattern = "http://%[1]s.tile.stamen.com/toner/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c", "d"}
