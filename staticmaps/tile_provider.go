@@ -46,7 +46,7 @@ func NewTileProviderThunderforestLandscape() *TileProvider {
 	return newTileProviderThunderforest("landscape")
 }
 
-// NewTileProviderThunderforestOutdoorscreates a TileProvider struct for thundeforests's 'outdoors' tile service
+// NewTileProviderThunderforestOutdoors creates a TileProvider struct for thundeforests's 'outdoors' tile service
 func NewTileProviderThunderforestOutdoors() *TileProvider {
 	return newTileProviderThunderforest("outdoors")
 }
