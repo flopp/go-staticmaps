@@ -1,5 +1,6 @@
-[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/flopp/go-staticmaps/)
+[![GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps?status.svg)](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps)
 [![Go Report Card](http://goreportcard.com/badge/flopp/go-staticmaps)](http://goreportcard.com/report/flopp/go-staticmaps)
+[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/flopp/go-staticmaps/)
 
 # go-staticmaps
 A go (golang) library and command line tool to render static map images using OpenStreetMap tiles.
