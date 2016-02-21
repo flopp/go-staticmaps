@@ -7,13 +7,13 @@ package main
 
 import (
 	"fmt"
-	"image/png"
 	"log"
 	"os"
 	"sort"
 
 	"github.com/flopp/go-coordsparser"
 	"github.com/flopp/go-staticmaps/staticmaps"
+	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
 	"github.com/jessevdk/go-flags"
 )
@@ -115,11 +115,8 @@ func main() {
 		return
 	}
 
-	file, err := os.Create(opts.Output)
-	if err != nil {
+	if err = gg.SavePNG(opts.Output, img); err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer file.Close()
-	png.Encode(file, img)
 }

@@ -24,13 +24,36 @@ go get -u github.com/flopp/go-staticmaps/...
 
 ### Library Usage
 
-The golang package can then be used through an
+Create a 400x300 pixel map with a red marker:
 
 ```go
-import "github.com/flopp/go-staticmaps"
+
+import (
+  "image/color"
+
+  "github.com/flopp/go-staticmaps"
+  "github.com/fogleman/gg"
+  "github.com/golang/geo/s2"
+)
+
+func main() {
+  m := staticmaps.NewMapCreator()
+  m.SetSize(400, 300)
+  m.AddMarker(staticmaps.NewMarker(s2.LatLng{52.514536, 13.350151}, color.RGBA{0xff, 0, 0, 0xff}, 16.0))
+
+  img, err := m.Create()
+  if err != nil {
+    panic(err)
+  }
+
+  if err := gg.SavePNG("my-map.png", img); err != nil {
+    panic(err)
+  }
+}
 ```
 
-See the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/cmd/create-static-map/create-static-map.go) for an example how to use the package.
+
+See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps) for a complete documentation and the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/cmd/create-static-map/create-static-map.go) for an example how to use the package.
 
 
 ### Command Line Usage
