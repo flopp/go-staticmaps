@@ -18,9 +18,19 @@ import (
 
 // Marker represents a marker on the map
 type Marker struct {
+	MapObject
 	Position s2.LatLng
 	Color    color.RGBA
 	Size     float64
+}
+
+// NewMarker creates a new Marker
+func NewMarker(pos s2.LatLng, col color.RGBA, size float64) *Marker {
+	m := new(Marker)
+	m.Position = pos
+	m.Color = col
+	m.Size = size
+	return m
 }
 
 func parseSizeString(s string) (float64, error) {
@@ -35,8 +45,9 @@ func parseSizeString(s string) (float64, error) {
 	return 0.0, fmt.Errorf("Cannot parse size string: %s", s)
 }
 
-func ParseMarkerString(s string) ([]Marker, error) {
-	markers := make([]Marker, 0, 0)
+// ParseMarkerString parses a string and returns an array of markers
+func ParseMarkerString(s string) ([]*Marker, error) {
+	markers := make([]*Marker, 0, 0)
 
 	color := color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
@@ -61,11 +72,20 @@ func ParseMarkerString(s string) ([]Marker, error) {
 			if err != nil {
 				return nil, err
 			}
-			marker := Marker{s2.LatLngFromDegrees(lat, lng), color, size}
-			markers = append(markers, marker)
+			markers = append(markers, NewMarker(s2.LatLngFromDegrees(lat, lng), color, size))
 		}
 	}
 	return markers, nil
+}
+
+func (m *Marker) extraMarginPixels() float64 {
+	return 1.0 + 1.5*m.Size
+}
+
+func (m *Marker) bounds() s2.Rect {
+	r := s2.EmptyRect()
+	r = r.AddPoint(m.Position)
+	return r
 }
 
 func (m *Marker) draw(dc *gg.Context, trans *transformer) {

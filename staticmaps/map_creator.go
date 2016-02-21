@@ -27,8 +27,8 @@ type MapCreator struct {
 	hasCenter bool
 	center    s2.LatLng
 
-	markers []Marker
-	paths   []Path
+	markers []*Marker
+	paths   []*Path
 
 	tileProvider *TileProvider
 }
@@ -68,7 +68,7 @@ func (m *MapCreator) SetCenter(center s2.LatLng) {
 }
 
 // AddMarker adds a marker to the MapCreator
-func (m *MapCreator) AddMarker(marker Marker) {
+func (m *MapCreator) AddMarker(marker *Marker) {
 	m.markers = append(m.markers, marker)
 }
 
@@ -78,7 +78,7 @@ func (m *MapCreator) ClearMarkers() {
 }
 
 // AddPath adds a path to the MapCreator
-func (m *MapCreator) AddPath(path Path) {
+func (m *MapCreator) AddPath(path *Path) {
 	m.paths = append(m.paths, path)
 }
 
@@ -90,15 +90,29 @@ func (m *MapCreator) ClearPaths() {
 func (m *MapCreator) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, marker := range m.markers {
-		r = r.AddPoint(marker.Position)
+		r = r.Union(marker.bounds())
 	}
 	for _, path := range m.paths {
-		for _, position := range path.Positions {
-			r = r.AddPoint(position)
+		r = r.Union(path.bounds())
+	}
+	return r
+}
+
+func (m *MapCreator) determineExtraMarginPixels() float64 {
+	p := 0.0
+	for _, marker := range m.markers {
+		pp := marker.extraMarginPixels()
+		if pp > p {
+			p = pp
 		}
 	}
-
-	return r
+	for _, path := range m.paths {
+		pp := path.extraMarginPixels()
+		if pp > p {
+			p = pp
+		}
+	}
+	return p
 }
 
 func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
@@ -108,9 +122,9 @@ func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 
 	tileSize := m.tileProvider.TileSize
-	margin := 16
-	w := float64(m.width-2*margin) / float64(tileSize)
-	h := float64(m.height-2*margin) / float64(tileSize)
+	margin := 4.0 + m.determineExtraMarginPixels()
+	w := (float64(m.width) - 2.0*margin) / float64(tileSize)
+	h := (float64(m.height) - 2.0*margin) / float64(tileSize)
 	minX := (b.Lo().Lng.Degrees() + 180.0) / 360.0
 	maxX := (b.Hi().Lng.Degrees() + 180.0) / 360.0
 	minY := (1.0 - math.Log(math.Tan(b.Lo().Lat.Radians())+(1.0/math.Cos(b.Lo().Lat.Radians())))/math.Pi) / 2.0

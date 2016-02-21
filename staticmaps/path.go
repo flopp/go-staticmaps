@@ -17,6 +17,7 @@ import (
 
 // Path represents a path or area on the map
 type Path struct {
+	MapObject
 	Positions []s2.LatLng
 	Color     color.RGBA
 	IsFilled  bool
@@ -25,39 +26,55 @@ type Path struct {
 }
 
 // ParsePathString parses a string and returns a path
-func ParsePathString(s string) (Path, error) {
-	path := Path{Positions: nil, Color: color.RGBA{0xff, 0, 0, 0xff}, IsFilled: false, FillColor: color.RGBA{}, Weight: 5.0}
+func ParsePathString(s string) (*Path, error) {
+	path := new(Path)
+	path.Color = color.RGBA{0xff, 0, 0, 0xff}
+	path.IsFilled = false
+	path.FillColor = color.RGBA{}
+	path.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
 			var err error
 			path.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
 			if err != nil {
-				return Path{}, err
+				return nil, err
 			}
 		} else if strings.HasPrefix(ss, "fillcolor:") {
 			path.IsFilled = true
 			var err error
 			path.FillColor, err = ParseColorString(strings.TrimPrefix(ss, "fillcolor:"))
 			if err != nil {
-				return Path{}, err
+				return nil, err
 			}
 		} else if strings.HasPrefix(ss, "weight:") {
 			var err error
 			path.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
 			if err != nil {
-				return Path{}, err
+				return nil, err
 			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
-				return Path{}, err
+				return nil, err
 			}
 			path.Positions = append(path.Positions, s2.LatLngFromDegrees(lat, lng))
 		}
 
 	}
 	return path, nil
+}
+
+func (p *Path) extraMarginPixels() float64 {
+	return 0.5 * p.Weight
+}
+
+func (p *Path) bounds() s2.Rect {
+	r := s2.EmptyRect()
+	for _, ll := range p.Positions {
+		r = r.AddPoint(ll)
+	}
+	return r
 }
 
 func (p *Path) draw(dc *gg.Context, trans *transformer) {
