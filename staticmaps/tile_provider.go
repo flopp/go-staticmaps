@@ -7,6 +7,7 @@ package staticmaps
 
 import "fmt"
 
+// TileProvider encapsulates all infos about a map tile provider service (name, url scheme, attribution, etc.)
 type TileProvider struct {
 	Name        string
 	Attribution string
@@ -15,10 +16,11 @@ type TileProvider struct {
 	Shards      []string
 }
 
-func (t *TileProvider) GetURL(shard string, zoom, x, y int) string {
+func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
 }
 
+// NewTileProviderMapQuest creates a TileProvider struct for mapquest's tile service
 func NewTileProviderMapQuest() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "mapquest"
@@ -39,18 +41,22 @@ func newTileProviderThunderforest(name string) *TileProvider {
 	return t
 }
 
+// NewTileProviderThunderforestLandscape creates a TileProvider struct for thundeforests's 'landscape' tile service
 func NewTileProviderThunderforestLandscape() *TileProvider {
 	return newTileProviderThunderforest("landscape")
 }
 
+// NewTileProviderThunderforestOutdoorscreates a TileProvider struct for thundeforests's 'outdoors' tile service
 func NewTileProviderThunderforestOutdoors() *TileProvider {
 	return newTileProviderThunderforest("outdoors")
 }
 
+// NewTileProviderThunderforestTransport creates a TileProvider struct for thundeforests's 'transport' tile service
 func NewTileProviderThunderforestTransport() *TileProvider {
 	return newTileProviderThunderforest("transport")
 }
 
+// NewTileProviderStamenToner creates a TileProvider struct for stamens' 'toner' tile service
 func NewTileProviderStamenToner() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "stamen-toner"

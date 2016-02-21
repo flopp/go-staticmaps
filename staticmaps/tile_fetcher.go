@@ -19,6 +19,7 @@ import (
 	"github.com/Wessie/appdirs"
 )
 
+// TileFetcher downloads map tile images from a TileProvider
 type TileFetcher struct {
 	tileProvider *TileProvider
 	cacheDir     string
@@ -41,7 +42,7 @@ func (t *TileFetcher) url(zoom, x, y int) string {
 	if len(t.tileProvider.Shards) > 0 {
 		shard = t.tileProvider.Shards[(x+y)%ss]
 	}
-	return t.tileProvider.GetURL(shard, zoom, x, y)
+	return t.tileProvider.getURL(shard, zoom, x, y)
 }
 
 func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
