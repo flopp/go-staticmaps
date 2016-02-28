@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps?status.svg)](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps)
+[![GoDoc](https://godoc.org/github.com/flopp/go-staticmaps?status.svg)](https://godoc.org/github.com/flopp/go-staticmaps)
 [![Go Report Card](http://goreportcard.com/badge/flopp/go-staticmaps)](http://goreportcard.com/report/flopp/go-staticmaps)
 [![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/flopp/go-staticmaps/)
 
@@ -37,11 +37,11 @@ import (
 )
 
 func main() {
-  m := staticmaps.NewMapCreator()
-  m.SetSize(400, 300)
-  m.AddMarker(staticmaps.NewMarker(s2.LatLng{52.514536, 13.350151}, color.RGBA{0xff, 0, 0, 0xff}, 16.0))
+  ctx := staticmaps.NewContext()
+  ctx.SetSize(400, 300)
+  ctx.AddMarker(staticmaps.NewMarker(s2.LatLng{52.514536, 13.350151}, color.RGBA{0xff, 0, 0, 0xff}, 16.0))
 
-  img, err := m.Create()
+  img, err := ctx.Render()
   if err != nil {
     panic(err)
   }

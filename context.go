@@ -16,8 +16,8 @@ import (
 	"github.com/golang/geo/s2"
 )
 
-// MapCreator class
-type MapCreator struct {
+// Context holds all information about the map image that is to be rendered
+type Context struct {
 	width  int
 	height int
 
@@ -34,9 +34,9 @@ type MapCreator struct {
 	tileProvider *TileProvider
 }
 
-// NewMapCreator creates a new instance of MapCreator
-func NewMapCreator() *MapCreator {
-	t := new(MapCreator)
+// NewContext creates a new instance of Context
+func NewContext() *Context {
+	t := new(Context)
 	t.width = 512
 	t.height = 512
 	t.hasZoom = false
@@ -46,59 +46,59 @@ func NewMapCreator() *MapCreator {
 }
 
 // SetTileProvider sets the TileProvider to be used
-func (m *MapCreator) SetTileProvider(t *TileProvider) {
+func (m *Context) SetTileProvider(t *TileProvider) {
 	m.tileProvider = t
 }
 
 // SetSize sets the size of the generated image
-func (m *MapCreator) SetSize(width, height int) {
+func (m *Context) SetSize(width, height int) {
 	m.width = width
 	m.height = height
 }
 
 // SetZoom sets the zoom level
-func (m *MapCreator) SetZoom(zoom int) {
+func (m *Context) SetZoom(zoom int) {
 	m.zoom = zoom
 	m.hasZoom = true
 }
 
 // SetCenter sets the center coordinates
-func (m *MapCreator) SetCenter(center s2.LatLng) {
+func (m *Context) SetCenter(center s2.LatLng) {
 	m.center = center
 	m.hasCenter = true
 }
 
-// AddMarker adds a marker to the MapCreator
-func (m *MapCreator) AddMarker(marker *Marker) {
+// AddMarker adds a marker to the Context
+func (m *Context) AddMarker(marker *Marker) {
 	m.markers = append(m.markers, marker)
 }
 
-// ClearMarkers removes all markers from the MapCreator
-func (m *MapCreator) ClearMarkers() {
+// ClearMarkers removes all markers from the Context
+func (m *Context) ClearMarkers() {
 	m.markers = nil
 }
 
-// AddPath adds a path to the MapCreator
-func (m *MapCreator) AddPath(path *Path) {
+// AddPath adds a path to the Context
+func (m *Context) AddPath(path *Path) {
 	m.paths = append(m.paths, path)
 }
 
-// ClearPaths removes all paths from the MapCreator
-func (m *MapCreator) ClearPaths() {
+// ClearPaths removes all paths from the Context
+func (m *Context) ClearPaths() {
 	m.paths = nil
 }
 
-// AddArea adds an area to the MapCreator
-func (m *MapCreator) AddArea(area *Area) {
+// AddArea adds an area to the Context
+func (m *Context) AddArea(area *Area) {
 	m.areas = append(m.areas, area)
 }
 
-// ClearAreas removes all areas from the MapCreator
-func (m *MapCreator) ClearAreas() {
+// ClearAreas removes all areas from the Context
+func (m *Context) ClearAreas() {
 	m.areas = nil
 }
 
-func (m *MapCreator) determineBounds() s2.Rect {
+func (m *Context) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, marker := range m.markers {
 		r = r.Union(marker.bounds())
@@ -112,30 +112,27 @@ func (m *MapCreator) determineBounds() s2.Rect {
 	return r
 }
 
-func (m *MapCreator) determineExtraMarginPixels() float64 {
+func (m *Context) determineExtraMarginPixels() float64 {
 	p := 0.0
 	for _, marker := range m.markers {
-		pp := marker.extraMarginPixels()
-		if pp > p {
+		if pp := marker.extraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
 	for _, path := range m.paths {
-		pp := path.extraMarginPixels()
-		if pp > p {
+		if pp := path.extraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
 	for _, area := range m.areas {
-		pp := area.extraMarginPixels()
-		if pp > p {
+		if pp := area.extraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
 	return p
 }
 
-func (m *MapCreator) determineZoom(bounds s2.Rect, center s2.LatLng) int {
+func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	b := bounds.AddPoint(center)
 	if b.IsEmpty() || b.IsPoint() {
 		return 15
@@ -212,8 +209,8 @@ func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
 	return x, y
 }
 
-// Create actually creates the image
-func (m *MapCreator) Create() (image.Image, error) {
+// Render actually renders the map image including all map objects (markers, paths, areas)
+func (m *Context) Render() (image.Image, error) {
 	bounds := m.determineBounds()
 
 	center := m.center
@@ -251,20 +248,19 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 	}
 
+	// draw map objects
 	gc := gg.NewContextForRGBA(img)
-
 	for _, area := range m.areas {
 		area.draw(gc, trans)
 	}
-
 	for _, path := range m.paths {
 		path.draw(gc, trans)
 	}
-
 	for _, marker := range m.markers {
 		marker.draw(gc, trans)
 	}
 
+	// crop image
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},

@@ -66,19 +66,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	m := staticmaps.NewMapCreator()
+	ctx := staticmaps.NewContext()
 
 	if parser.FindOptionByLongName("type").IsSet() {
 		tp := getTileProviderOrExit(opts.Type)
 		if tp != nil {
-			m.SetTileProvider(tp)
+			ctx.SetTileProvider(tp)
 		}
 	}
 
-	m.SetSize(opts.Width, opts.Height)
+	ctx.SetSize(opts.Width, opts.Height)
 
 	if parser.FindOptionByLongName("zoom").IsSet() {
-		m.SetZoom(opts.Zoom)
+		ctx.SetZoom(opts.Zoom)
 	}
 
 	if parser.FindOptionByLongName("center").IsSet() {
@@ -86,7 +86,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			m.SetCenter(s2.LatLngFromDegrees(lat, lng))
+			ctx.SetCenter(s2.LatLngFromDegrees(lat, lng))
 		}
 	}
 
@@ -96,7 +96,7 @@ func main() {
 			log.Fatal(err)
 		} else {
 			for _, marker := range markers {
-				m.AddMarker(marker)
+				ctx.AddMarker(marker)
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			m.AddPath(path)
+			ctx.AddPath(path)
 		}
 	}
 
@@ -115,11 +115,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			m.AddArea(area)
+			ctx.AddArea(area)
 		}
 	}
 
-	img, err := m.Create()
+	img, err := ctx.Render()
 	if err != nil {
 		log.Fatal(err)
 		return
