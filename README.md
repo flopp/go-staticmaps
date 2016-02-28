@@ -19,7 +19,7 @@ go-staticmaps comes with a command line tool called `create-static-map` for use 
 Installing go-staticmaps is as easy as
 
 ```bash
-go get -u github.com/flopp/go-staticmaps/...
+go get -u github.com/flopp/go-staticmaps
 ```
 
 ### Library Usage
