@@ -110,7 +110,7 @@ func (m *Marker) draw(gc *gg.Context, trans *transformer) {
 	gc.Stroke()
 
 	if m.Label != "" {
-		if Luma(m.Color) >= 0.5 {
+		if Luminance(m.Color) >= 0.5 {
 			gc.SetColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
 		} else {
 			gc.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})

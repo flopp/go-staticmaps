@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/Wessie/appdirs"
 )
@@ -46,7 +47,7 @@ func (t *TileFetcher) url(zoom, x, y int) string {
 }
 
 func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
-	return fmt.Sprintf("%s/%d-%d-%d", t.cacheDir, zoom, x, y)
+	return fmt.Sprintf("%s/%d/%d/%d", t.cacheDir, zoom, x, y)
 }
 
 // ToggleCaching enables/disables caching
@@ -77,8 +78,7 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 
 	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)
-		err = t.storeCache(fileName, data)
-		if err != nil {
+		if err = t.storeCache(fileName, data); err != nil {
 			fmt.Println("Failed to store image as", fileName)
 			fmt.Println(err)
 		}
@@ -118,23 +118,24 @@ func (t *TileFetcher) loadCache(fileName string) (image.Image, error) {
 	return img, nil
 }
 
-func (t *TileFetcher) createCacheDir() error {
-	src, err := os.Stat(t.cacheDir)
+func (t *TileFetcher) createCacheDir(path string) error {
+	src, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return os.MkdirAll(t.cacheDir, 0777)
+			return os.MkdirAll(path, 0777)
 		}
 		return err
 	}
 	if src.IsDir() {
 		return nil
 	}
-	return fmt.Errorf("File exists but is not a directory: %s", t.cacheDir)
+	return fmt.Errorf("File exists but is not a directory: %s", path)
 }
 
 func (t *TileFetcher) storeCache(fileName string, data []byte) error {
-	err := t.createCacheDir()
-	if err != nil {
+	dir, _ := filepath.Split(fileName)
+
+	if err := t.createCacheDir(dir); err != nil {
 		return err
 	}
 
@@ -144,8 +145,7 @@ func (t *TileFetcher) storeCache(fileName string, data []byte) error {
 	}
 	defer file.Close()
 
-	_, err = io.Copy(file, bytes.NewBuffer(data))
-	if err != nil {
+	if _, err = io.Copy(file, bytes.NewBuffer(data)); err != nil {
 		return err
 	}
 

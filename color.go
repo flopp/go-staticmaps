@@ -58,7 +58,8 @@ func ParseColorString(s string) (color.Color, error) {
 	return color.Transparent, fmt.Errorf("Cannot parse color string: %s", s)
 }
 
-func Luma(col color.Color) float64 {
+// Luminance computes the luminance (~ brightness) of the given color. Range: 0.0 for black to 1.0 for white.
+func Luminance(col color.Color) float64 {
 	r, g, b, _ := col.RGBA()
 	return (float64(r)*0.299 + float64(g)*0.587 + float64(b)*0.114) / float64(0xffff)
 }
