@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"strconv"
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
@@ -36,12 +37,17 @@ func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 }
 
 func parseSizeString(s string) (float64, error) {
-	if s == "mid" {
+	switch {
+	case s == "mid":
 		return 16.0, nil
-	} else if s == "small" {
+	case s == "small":
 		return 12.0, nil
-	} else if s == "tiny" {
+	case s == "tiny":
 		return 8.0, nil
+	}
+
+	if ss, err := strconv.ParseFloat(s, 64); err != nil && ss > 0 {
+		return ss, nil
 	}
 
 	return 0.0, fmt.Errorf("Cannot parse size string: %s", s)
@@ -56,17 +62,17 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 	label := ""
 
 	for _, ss := range strings.Split(s, "|") {
-		if strings.HasPrefix(ss, "color:") {
+		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
+			color, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
-		} else if strings.HasPrefix(ss, "label:") {
-			label = strings.TrimPrefix(ss, "label:")
-		} else if strings.HasPrefix(ss, "size:") {
+		} else if ok, suffix := hasPrefix(ss, "label:"); ok {
+			label = suffix
+		} else if ok, suffix := hasPrefix(ss, "size:"); ok {
 			var err error
-			size, err = parseSizeString(strings.TrimPrefix(ss, "size:"))
+			size, err = parseSizeString(suffix)
 			if err != nil {
 				return nil, err
 			}
@@ -95,7 +101,6 @@ func (m *Marker) bounds() s2.Rect {
 
 func (m *Marker) draw(gc *gg.Context, trans *transformer) {
 	gc.ClearPath()
-
 	gc.SetLineJoin(gg.LineJoinRound)
 	gc.SetLineWidth(1.0)
 

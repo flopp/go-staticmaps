@@ -91,7 +91,7 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 `MARKER_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
 
 - `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
-- `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny` (default: `mid`)
+- `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny`, or some number > 0 (default: `mid`)
 - `label:LABEL` - where `LABEL` is an alpha numeric character, i.e. `A`-`Z`, `a`-`z`, `0`-`9`; (default: no label)
 
 ### Paths

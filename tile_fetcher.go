@@ -13,6 +13,7 @@ import (
 	_ "image/png"  // to be able to decode pngs
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -78,9 +79,8 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 
 	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)
-		if err = t.storeCache(fileName, data); err != nil {
-			fmt.Println("Failed to store image as", fileName)
-			fmt.Println(err)
+		if err := t.storeCache(fileName, data); err != nil {
+			log.Printf("Failed to store map tile as '%s': %s", fileName, err)
 		}
 	}
 

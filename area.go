@@ -32,21 +32,21 @@ func ParseAreaString(s string) (*Area, error) {
 	area.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
-		if strings.HasPrefix(ss, "color:") {
+		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			area.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
+			area.Color, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
-		} else if strings.HasPrefix(ss, "fill:") {
+		} else if ok, suffix := hasPrefix(ss, "fill:"); ok {
 			var err error
-			area.Fill, err = ParseColorString(strings.TrimPrefix(ss, "fill:"))
+			area.Fill, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
-		} else if strings.HasPrefix(ss, "weight:") {
+		} else if ok, suffix := hasPrefix(ss, "weight:"); ok {
 			var err error
-			area.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
+			area.Weight, err = strconv.ParseFloat(suffix, 64)
 			if err != nil {
 				return nil, err
 			}
@@ -80,15 +80,12 @@ func (p *Area) draw(gc *gg.Context, trans *transformer) {
 	}
 
 	gc.ClearPath()
-
 	gc.SetLineWidth(p.Weight)
 	gc.SetLineCap(gg.LineCapRound)
 	gc.SetLineJoin(gg.LineJoinRound)
-
 	for _, ll := range p.Positions {
 		gc.LineTo(trans.ll2p(ll))
 	}
-
 	gc.ClosePath()
 	gc.SetColor(p.Fill)
 	gc.FillPreserve()

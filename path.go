@@ -30,15 +30,15 @@ func ParsePathString(s string) (*Path, error) {
 	path.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
-		if strings.HasPrefix(ss, "color:") {
+		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			path.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
+			path.Color, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
-		} else if strings.HasPrefix(ss, "weight:") {
+		} else if ok, suffix := hasPrefix(ss, "weight:"); ok {
 			var err error
-			path.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
+			path.Weight, err = strconv.ParseFloat(suffix, 64)
 			if err != nil {
 				return nil, err
 			}
@@ -72,15 +72,12 @@ func (p *Path) draw(gc *gg.Context, trans *transformer) {
 	}
 
 	gc.ClearPath()
-
 	gc.SetLineWidth(p.Weight)
 	gc.SetLineCap(gg.LineCapRound)
 	gc.SetLineJoin(gg.LineJoinRound)
-
 	for _, ll := range p.Positions {
 		gc.LineTo(trans.ll2p(ll))
 	}
-
 	gc.SetColor(p.Color)
 	gc.Stroke()
 }
