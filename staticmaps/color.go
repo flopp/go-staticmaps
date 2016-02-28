@@ -13,7 +13,7 @@ import (
 )
 
 // ParseColorString parses hex color strings (i.e. `0xRRGGBB`, `#RRGGBB`, `0xRRGGBBAA`, `#RRGGBBAA`), and names colors (e.g. 'black', 'blue', ...)
-func ParseColorString(s string) (color.RGBA, error) {
+func ParseColorString(s string) (color.Color, error) {
 	s = strings.ToLower(strings.TrimSpace(s))
 
 	re := regexp.MustCompile(`^(0x|#)([A-Fa-f0-9]{6})$`)
@@ -55,5 +55,5 @@ func ParseColorString(s string) (color.RGBA, error) {
 	case "white":
 		return color.RGBA{0xff, 0xff, 0xff, 0xff}, nil
 	}
-	return color.RGBA{}, fmt.Errorf("Cannot parse color string: %s", s)
+	return color.Transparent, fmt.Errorf("Cannot parse color string: %s", s)
 }

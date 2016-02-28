@@ -20,12 +20,12 @@ import (
 type Marker struct {
 	MapObject
 	Position s2.LatLng
-	Color    color.RGBA
+	Color    color.Color
 	Size     float64
 }
 
 // NewMarker creates a new Marker
-func NewMarker(pos s2.LatLng, col color.RGBA, size float64) *Marker {
+func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	m := new(Marker)
 	m.Position = pos
 	m.Color = col
@@ -49,7 +49,7 @@ func parseSizeString(s string) (float64, error) {
 func ParseMarkerString(s string) ([]*Marker, error) {
 	markers := make([]*Marker, 0, 0)
 
-	color := color.RGBA{0xff, 0, 0, 0xff}
+	var color color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
 
 	for _, ss := range strings.Split(s, "|") {

@@ -19,9 +19,9 @@ import (
 type Path struct {
 	MapObject
 	Positions []s2.LatLng
-	Color     color.RGBA
+	Color     color.Color
 	IsFilled  bool
-	FillColor color.RGBA
+	FillColor color.Color
 	Weight    float64
 }
 
@@ -30,7 +30,7 @@ func ParsePathString(s string) (*Path, error) {
 	path := new(Path)
 	path.Color = color.RGBA{0xff, 0, 0, 0xff}
 	path.IsFilled = false
-	path.FillColor = color.RGBA{}
+	path.FillColor = color.Transparent
 	path.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
