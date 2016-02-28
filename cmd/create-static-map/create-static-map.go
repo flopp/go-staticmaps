@@ -18,8 +18,8 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-func getTileProviderOrExit(name string) *staticmaps.TileProvider {
-	tileProviders := staticmaps.GetTileProviders()
+func getTileProviderOrExit(name string) *sm.TileProvider {
+	tileProviders := sm.GetTileProviders()
 	tp := tileProviders[name]
 	if tp != nil {
 		return tp
@@ -66,7 +66,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	ctx := staticmaps.NewContext()
+	ctx := sm.NewContext()
 
 	if parser.FindOptionByLongName("type").IsSet() {
 		tp := getTileProviderOrExit(opts.Type)
@@ -91,7 +91,7 @@ func main() {
 	}
 
 	for _, markerString := range opts.Markers {
-		markers, err := staticmaps.ParseMarkerString(markerString)
+		markers, err := sm.ParseMarkerString(markerString)
 		if err != nil {
 			log.Fatal(err)
 		} else {
@@ -102,7 +102,7 @@ func main() {
 	}
 
 	for _, pathString := range opts.Paths {
-		path, err := staticmaps.ParsePathString(pathString)
+		path, err := sm.ParsePathString(pathString)
 		if err != nil {
 			log.Fatal(err)
 		} else {
@@ -111,7 +111,7 @@ func main() {
 	}
 
 	for _, areaString := range opts.Areas {
-		area, err := staticmaps.ParseAreaString(areaString)
+		area, err := sm.ParseAreaString(areaString)
 		if err != nil {
 			log.Fatal(err)
 		} else {

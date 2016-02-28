@@ -1,4 +1,4 @@
-package staticmaps
+package sm
 
 import (
 	"github.com/fogleman/gg"
