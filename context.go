@@ -229,6 +229,7 @@ func (m *Context) Render() (image.Image, error) {
 	tileSize := m.tileProvider.TileSize
 	trans := newTransformer(m.width, m.height, zoom, center, tileSize)
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
+	gc := gg.NewContextForRGBA(img)
 
 	// fetch and draw tiles to img
 	t := NewTileFetcher(m.tileProvider)
@@ -239,17 +240,13 @@ func (m *Context) Render() (image.Image, error) {
 		}
 		for yy := 0; yy < trans.tCountY; yy++ {
 			y := trans.tOriginY + yy
-			tileImg, err := t.Fetch(zoom, x, y)
-
-			if err == nil {
-				rect := image.Rect(xx*tileSize, yy*tileSize, (xx+1)*tileSize, (yy+1)*tileSize)
-				draw.Draw(img, rect, tileImg, image.ZP, draw.Src)
+			if tileImg, err := t.Fetch(zoom, x, y); err == nil {
+				gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
 			}
 		}
 	}
 
 	// draw map objects
-	gc := gg.NewContextForRGBA(img)
 	for _, area := range m.areas {
 		area.draw(gc, trans)
 	}
