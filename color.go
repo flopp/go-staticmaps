@@ -20,7 +20,7 @@ func ParseColorString(s string) (color.Color, error) {
 	matches := re.FindStringSubmatch(s)
 	if matches != nil {
 		var r, g, b int
-		fmt.Sscanf(matches[2], "%2x%3x%2x", &r, &g, &b)
+		fmt.Sscanf(matches[2], "%2x%2x%2x", &r, &g, &b)
 		return color.RGBA{uint8(r), uint8(g), uint8(b), 0xff}, nil
 	}
 
@@ -28,7 +28,7 @@ func ParseColorString(s string) (color.Color, error) {
 	matches = re.FindStringSubmatch(s)
 	if matches != nil {
 		var r, g, b, a int
-		fmt.Sscanf(matches[2], "%2x%3x%2x%2x", &r, &g, &b, &a)
+		fmt.Sscanf(matches[2], "%2x%2x%2x%2x", &r, &g, &b, &a)
 		rr := float64(r) * float64(a) / 256.0
 		gg := float64(g) * float64(a) / 256.0
 		bb := float64(b) * float64(a) / 256.0
@@ -56,4 +56,9 @@ func ParseColorString(s string) (color.Color, error) {
 		return color.RGBA{0xff, 0xff, 0xff, 0xff}, nil
 	}
 	return color.Transparent, fmt.Errorf("Cannot parse color string: %s", s)
+}
+
+func Luma(col color.Color) float64 {
+	r, g, b, _ := col.RGBA()
+	return (float64(r)*0.299 + float64(g)*0.587 + float64(b)*0.114) / float64(0xffff)
 }

@@ -92,6 +92,7 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 
 - `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
 - `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny` (default: `mid`)
+- `label:LABEL` - where `LABEL` is an alpha numeric character, i.e. `A`-`Z`, `a`-`z`, `0`-`9`; (default: no label)
 
 ### Paths
 The `--path` option defines a path on the map. Use multiple `--path` options to add multiple paths to the map.

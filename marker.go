@@ -22,6 +22,7 @@ type Marker struct {
 	Position s2.LatLng
 	Color    color.Color
 	Size     float64
+	Label    string
 }
 
 // NewMarker creates a new Marker
@@ -30,6 +31,7 @@ func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	m.Position = pos
 	m.Color = col
 	m.Size = size
+	m.Label = ""
 	return m
 }
 
@@ -51,6 +53,7 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 
 	var color color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
+	label := ""
 
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
@@ -60,7 +63,7 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 				return nil, err
 			}
 		} else if strings.HasPrefix(ss, "label:") {
-			// TODO
+			label = strings.TrimPrefix(ss, "label:")
 		} else if strings.HasPrefix(ss, "size:") {
 			var err error
 			size, err = parseSizeString(strings.TrimPrefix(ss, "size:"))
@@ -72,7 +75,9 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			if err != nil {
 				return nil, err
 			}
-			markers = append(markers, NewMarker(s2.LatLngFromDegrees(lat, lng), color, size))
+			m := NewMarker(s2.LatLngFromDegrees(lat, lng), color, size)
+			m.Label = label
+			markers = append(markers, m)
 		}
 	}
 	return markers, nil
@@ -103,4 +108,13 @@ func (m *Marker) draw(gc *gg.Context, trans *transformer) {
 	gc.FillPreserve()
 	gc.SetRGB(0, 0, 0)
 	gc.Stroke()
+
+	if m.Label != "" {
+		if Luma(m.Color) >= 0.5 {
+			gc.SetColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
+		} else {
+			gc.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+		}
+		gc.DrawStringAnchored(m.Label, x, y-m.Size, 0.5, 0.5)
+	}
 }
