@@ -72,6 +72,7 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps) for a c
       -z, --zoom=ZOOMLEVEL     Zoom factor
       -m, --marker=MARKER      Add a marker to the static map
       -p, --path=PATH          Add a path to the static map
+      -a, --area=AREA          Add an area to the static map
 
     Help Options:
       -h, --help               Show this help message
@@ -93,15 +94,25 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 - `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny` (default: `mid`)
 
 ### Paths
-The `--path` option defines a path or an area on the map. Use multiple `--path` options to add multiple paths/areas to the map.
+The `--path` option defines a path on the map. Use multiple `--path` options to add multiple paths to the map.
 
     --path PATH_STYLES|LATLNG|LATLNG|...
 
 `PATH_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
 
 - `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
-- `fillcolor:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: none); if a fill color is specified, the path is drawn as a closed, filled area
 - `weight:WEIGHT` - where `WEIGHT` is the line width in pixels (defaut: `5`)
+
+### Areas
+The `--area` option defines a closed area on the map. Use multiple `--area` options to add multiple areas to the map.
+
+    --area AREA_STYLES|LATLNG|LATLNG|...
+
+`AREA_STYLES` consists of a set of style descriptors separated by the pipe character `|`:
+
+- `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
+- `weight:WEIGHT` - where `WEIGHT` is the line width in pixels (defaut: `5`)
+- `fill:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: none)
 
 
 ## Examples
@@ -183,7 +194,7 @@ $ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.35
       --center="-26.284973,134.303764" \
       --output "australia.png" \
       --marker "color:blue|-35.305200,149.121574" \
-      --path "color:0x00FF00|fillcolor:0x00FF007F|weight:2|-25.994024,129.013847|-25.994024,137.989677|-16.537670,138.011649|\
+      --area "color:0x00FF00|fill:0x00FF007F|weight:2|-25.994024,129.013847|-25.994024,137.989677|-16.537670,138.011649|\
         -14.834820,135.385917|-12.293236,137.033866|-11.174554,130.398124|-12.925791,130.167411|-14.866678,129.002860"
 
 ![Static map of Australia](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/australia.png)

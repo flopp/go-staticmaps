@@ -88,19 +88,19 @@ func (m *Marker) bounds() s2.Rect {
 	return r
 }
 
-func (m *Marker) draw(dc *gg.Context, trans *transformer) {
-	dc.ClearPath()
+func (m *Marker) draw(gc *gg.Context, trans *transformer) {
+	gc.ClearPath()
 
-	dc.SetLineJoin(gg.LineJoinRound)
-	dc.SetLineWidth(1.0)
+	gc.SetLineJoin(gg.LineJoinRound)
+	gc.SetLineWidth(1.0)
 
 	radius := 0.5 * m.Size
 	x, y := trans.ll2p(m.Position)
-	dc.DrawArc(x, y-m.Size, radius, (90.0+60.0)*math.Pi/180.0, (360.0+90.0-60.0)*math.Pi/180.0)
-	dc.LineTo(x, y)
-	dc.ClosePath()
-	dc.SetColor(m.Color)
-	dc.FillPreserve()
-	dc.SetRGB(0, 0, 0)
-	dc.Stroke()
+	gc.DrawArc(x, y-m.Size, radius, (90.0+60.0)*math.Pi/180.0, (360.0+90.0-60.0)*math.Pi/180.0)
+	gc.LineTo(x, y)
+	gc.ClosePath()
+	gc.SetColor(m.Color)
+	gc.FillPreserve()
+	gc.SetRGB(0, 0, 0)
+	gc.Stroke()
 }

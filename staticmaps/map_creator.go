@@ -29,6 +29,7 @@ type MapCreator struct {
 
 	markers []*Marker
 	paths   []*Path
+	areas   []*Area
 
 	tileProvider *TileProvider
 }
@@ -87,6 +88,16 @@ func (m *MapCreator) ClearPaths() {
 	m.paths = nil
 }
 
+// AddArea adds an area to the MapCreator
+func (m *MapCreator) AddArea(area *Area) {
+	m.areas = append(m.areas, area)
+}
+
+// ClearAreas removes all areas from the MapCreator
+func (m *MapCreator) ClearAreas() {
+	m.areas = nil
+}
+
 func (m *MapCreator) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, marker := range m.markers {
@@ -94,6 +105,9 @@ func (m *MapCreator) determineBounds() s2.Rect {
 	}
 	for _, path := range m.paths {
 		r = r.Union(path.bounds())
+	}
+	for _, area := range m.areas {
+		r = r.Union(area.bounds())
 	}
 	return r
 }
@@ -108,6 +122,12 @@ func (m *MapCreator) determineExtraMarginPixels() float64 {
 	}
 	for _, path := range m.paths {
 		pp := path.extraMarginPixels()
+		if pp > p {
+			p = pp
+		}
+	}
+	for _, area := range m.areas {
+		pp := area.extraMarginPixels()
 		if pp > p {
 			p = pp
 		}
@@ -231,29 +251,34 @@ func (m *MapCreator) Create() (image.Image, error) {
 		}
 	}
 
-	dc := gg.NewContextForRGBA(img)
+	gc := gg.NewContextForRGBA(img)
+
+	for _, area := range m.areas {
+		area.draw(gc, trans)
+	}
 
 	for _, path := range m.paths {
-		path.draw(dc, trans)
+		path.draw(gc, trans)
 	}
 
 	for _, marker := range m.markers {
-		marker.draw(dc, trans)
+		marker.draw(gc, trans)
 	}
+
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
 	draw.Draw(croppedImg, image.Rect(0, 0, int(m.width), int(m.height)),
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
 	// draw attribution
-	_, textHeight := dc.MeasureString(m.tileProvider.Attribution)
+	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
 	boxHeight := textHeight + 4.0
-	dc = gg.NewContextForRGBA(croppedImg)
-	dc.SetRGBA(0.0, 0.0, 0.0, 0.5)
-	dc.DrawRectangle(0.0, float64(m.height)-boxHeight, float64(m.width), boxHeight)
-	dc.Fill()
-	dc.SetRGBA(1.0, 1.0, 1.0, 0.75)
-	dc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
+	gc = gg.NewContextForRGBA(croppedImg)
+	gc.SetRGBA(0.0, 0.0, 0.0, 0.5)
+	gc.DrawRectangle(0.0, float64(m.height)-boxHeight, float64(m.width), boxHeight)
+	gc.Fill()
+	gc.SetRGBA(1.0, 1.0, 1.0, 0.75)
+	gc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
 
 	return croppedImg, nil
 }

@@ -54,6 +54,7 @@ func main() {
 		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths   []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
+		Areas   []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -106,6 +107,15 @@ func main() {
 			log.Fatal(err)
 		} else {
 			m.AddPath(path)
+		}
+	}
+
+	for _, areaString := range opts.Areas {
+		area, err := staticmaps.ParseAreaString(areaString)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			m.AddArea(area)
 		}
 	}
 

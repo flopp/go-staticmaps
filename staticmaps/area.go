@@ -15,30 +15,38 @@ import (
 	"github.com/golang/geo/s2"
 )
 
-// Path represents a path or area on the map
-type Path struct {
+// Area represents a area or area on the map
+type Area struct {
 	MapObject
 	Positions []s2.LatLng
 	Color     color.Color
+	Fill      color.Color
 	Weight    float64
 }
 
-// ParsePathString parses a string and returns a path
-func ParsePathString(s string) (*Path, error) {
-	path := new(Path)
-	path.Color = color.RGBA{0xff, 0, 0, 0xff}
-	path.Weight = 5.0
+// ParseAreaString parses a string and returns an area
+func ParseAreaString(s string) (*Area, error) {
+	area := new(Area)
+	area.Color = color.RGBA{0xff, 0, 0, 0xff}
+	area.Fill = color.Transparent
+	area.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
 		if strings.HasPrefix(ss, "color:") {
 			var err error
-			path.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
+			area.Color, err = ParseColorString(strings.TrimPrefix(ss, "color:"))
+			if err != nil {
+				return nil, err
+			}
+		} else if strings.HasPrefix(ss, "fill:") {
+			var err error
+			area.Fill, err = ParseColorString(strings.TrimPrefix(ss, "fill:"))
 			if err != nil {
 				return nil, err
 			}
 		} else if strings.HasPrefix(ss, "weight:") {
 			var err error
-			path.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
+			area.Weight, err = strconv.ParseFloat(strings.TrimPrefix(ss, "weight:"), 64)
 			if err != nil {
 				return nil, err
 			}
@@ -47,18 +55,18 @@ func ParsePathString(s string) (*Path, error) {
 			if err != nil {
 				return nil, err
 			}
-			path.Positions = append(path.Positions, s2.LatLngFromDegrees(lat, lng))
+			area.Positions = append(area.Positions, s2.LatLngFromDegrees(lat, lng))
 		}
 
 	}
-	return path, nil
+	return area, nil
 }
 
-func (p *Path) extraMarginPixels() float64 {
+func (p *Area) extraMarginPixels() float64 {
 	return 0.5 * p.Weight
 }
 
-func (p *Path) bounds() s2.Rect {
+func (p *Area) bounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, ll := range p.Positions {
 		r = r.AddPoint(ll)
@@ -66,7 +74,7 @@ func (p *Path) bounds() s2.Rect {
 	return r
 }
 
-func (p *Path) draw(gc *gg.Context, trans *transformer) {
+func (p *Area) draw(gc *gg.Context, trans *transformer) {
 	if len(p.Positions) <= 1 {
 		return
 	}
@@ -81,6 +89,9 @@ func (p *Path) draw(gc *gg.Context, trans *transformer) {
 		gc.LineTo(trans.ll2p(ll))
 	}
 
+	gc.ClosePath()
+	gc.SetColor(p.Fill)
+	gc.FillPreserve()
 	gc.SetColor(p.Color)
 	gc.Stroke()
 }
