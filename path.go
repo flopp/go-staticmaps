@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
-	"github.com/flopp/go-gpx"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
+	"github.com/ptrv/go-gpx"
 )
 
 // Path represents a path or area on the map
