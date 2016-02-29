@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/flopp/go-coordsparser"
+	"github.com/flopp/go-gpx"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
 )
@@ -24,34 +25,55 @@ type Path struct {
 }
 
 // ParsePathString parses a string and returns a path
-func ParsePathString(s string) (*Path, error) {
-	path := new(Path)
-	path.Color = color.RGBA{0xff, 0, 0, 0xff}
-	path.Weight = 5.0
+func ParsePathString(s string) ([]*Path, error) {
+	paths := make([]*Path, 0, 0)
+	currentPath := new(Path)
+	currentPath.Color = color.RGBA{0xff, 0, 0, 0xff}
+	currentPath.Weight = 5.0
 
 	for _, ss := range strings.Split(s, "|") {
 		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			path.Color, err = ParseColorString(suffix)
+			currentPath.Color, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "weight:"); ok {
 			var err error
-			path.Weight, err = strconv.ParseFloat(suffix, 64)
+			currentPath.Weight, err = strconv.ParseFloat(suffix, 64)
 			if err != nil {
 				return nil, err
+			}
+		} else if ok, suffix := hasPrefix(ss, "gpx:"); ok {
+			gpxFile, err := gpx.ParseFile(suffix)
+			if err != nil {
+				return nil, err
+			}
+			for _, trk := range gpxFile.Tracks {
+				for _, seg := range trk.Segments {
+					p := new(Path)
+					p.Color = currentPath.Color
+					p.Weight = currentPath.Weight
+					for _, wpt := range seg.Waypoints {
+						p.Positions = append(p.Positions, s2.LatLngFromDegrees(wpt.Lat, wpt.Lon))
+					}
+					if len(p.Positions) > 0 {
+						paths = append(paths, p)
+					}
+				}
 			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
 				return nil, err
 			}
-			path.Positions = append(path.Positions, s2.LatLngFromDegrees(lat, lng))
+			currentPath.Positions = append(currentPath.Positions, s2.LatLngFromDegrees(lat, lng))
 		}
-
 	}
-	return path, nil
+	if len(currentPath.Positions) > 0 {
+		paths = append(paths, currentPath)
+	}
+	return paths, nil
 }
 
 func (p *Path) extraMarginPixels() float64 {

@@ -102,11 +102,13 @@ func main() {
 	}
 
 	for _, pathString := range opts.Paths {
-		path, err := sm.ParsePathString(pathString)
+		paths, err := sm.ParsePathString(pathString)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			ctx.AddPath(path)
+			for _, path := range paths {
+				ctx.AddPath(path)
+			}
 		}
 	}
 
