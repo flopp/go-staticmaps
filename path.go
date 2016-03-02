@@ -13,7 +13,7 @@ import (
 	"github.com/flopp/go-coordsparser"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
-	"github.com/ptrv/go-gpx"
+	"github.com/tkrajina/gpxgo/gpx"
 )
 
 // Path represents a path or area on the map
@@ -34,28 +34,26 @@ func ParsePathString(s string) ([]*Path, error) {
 	for _, ss := range strings.Split(s, "|") {
 		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			currentPath.Color, err = ParseColorString(suffix)
-			if err != nil {
+			if currentPath.Color, err = ParseColorString(suffix); err != nil {
 				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "weight:"); ok {
 			var err error
-			currentPath.Weight, err = strconv.ParseFloat(suffix, 64)
-			if err != nil {
+			if currentPath.Weight, err = strconv.ParseFloat(suffix, 64); err != nil {
 				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "gpx:"); ok {
-			gpxFile, err := gpx.ParseFile(suffix)
+			gpxData, err := gpx.ParseFile(suffix)
 			if err != nil {
 				return nil, err
 			}
-			for _, trk := range gpxFile.Tracks {
+			for _, trk := range gpxData.Tracks {
 				for _, seg := range trk.Segments {
 					p := new(Path)
 					p.Color = currentPath.Color
 					p.Weight = currentPath.Weight
-					for _, wpt := range seg.Waypoints {
-						p.Positions = append(p.Positions, s2.LatLngFromDegrees(wpt.Lat, wpt.Lon))
+					for _, pt := range seg.Points {
+						p.Positions = append(p.Positions, s2.LatLngFromDegrees(pt.GetLatitude(), pt.GetLongitude()))
 					}
 					if len(p.Positions) > 0 {
 						paths = append(paths, p)

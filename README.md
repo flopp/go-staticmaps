@@ -195,7 +195,7 @@ Besides the go standard library, go-staticmaps uses
 - Go Graphics (https://github.com/fogleman/gg) for 2D drawing
 - S2 geometry library (https://github.com/golang/geo) for spherical geometry calculations
 - appdirs (https://github.com/Wessie/appdirs) for platform specific system directories
-- go-gpx (https://github.com/ptrv/go-gpx) fo loading GPX files
+- gpxgo (github.com/tkrajina/gpxgo) for loading GPX files
 - go-coordsparser (https://github.com/flopp/go-coordsparser) for parsing geo coordinates
 
 ## License
