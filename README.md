@@ -27,7 +27,6 @@ go get -u github.com/flopp/go-staticmaps
 Create a 400x300 pixel map with a red marker:
 
 ```go
-
 import (
   "image/color"
 
@@ -148,8 +147,6 @@ $ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.35
 ![Example 3](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/map3.png)
 
 
-
-
 ### Create a map of the Berlin Marathon
 
     create-static-map --width 800 --height 600 \
@@ -191,12 +188,12 @@ $ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.35
 ## Acknowledgements
 Besides the go standard library, go-staticmaps uses
 
-- MapQuest (https://developer.mapquest.com/), Thunderforest (http://www.thunderforest.com/), and Stamen (http://maps.stamen.com/) as map tile providers
-- Go Graphics (https://github.com/fogleman/gg) for 2D drawing
-- S2 geometry library (https://github.com/golang/geo) for spherical geometry calculations
-- appdirs (https://github.com/Wessie/appdirs) for platform specific system directories
-- gpxgo (github.com/tkrajina/gpxgo) for loading GPX files
-- go-coordsparser (https://github.com/flopp/go-coordsparser) for parsing geo coordinates
+- [MapQuest](https://developer.mapquest.com/), [Thunderforest](http://www.thunderforest.com/), and [Stamen](http://maps.stamen.com/) as map tile providers
+- [Go Graphics](https://github.com/fogleman/gg) for 2D drawing
+- [S2 geometry library](https://github.com/golang/geo) for spherical geometry calculations
+- [appdirs](https://github.com/Wessie/appdirs) for platform specific system directories
+- [gpxgo](github.com/tkrajina/gpxgo) for loading GPX files
+- [go-coordsparser](https://github.com/flopp/go-coordsparser) for parsing geo coordinates
 
 ## License
 Copyright 2016 Florian Pigorsch. All rights reserved.
