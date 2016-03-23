@@ -73,7 +73,7 @@ func NewTileProviderOpenTopoMap() *TileProvider {
 	t.Name = "opentopomap"
 	t.Attribution = "Maps (c) OpenTopoMap [CC-BY-SA]; Data (c) OSM and contributors [ODbL]; Data (c) SRTM"
 	t.TileSize = 256
-	t.URLPattern = "http://%[1].tile.opentopomap.org/%[2]d/%[3]d/%[4]d.png"
+	t.URLPattern = "http://%[1]s.tile.opentopomap.org/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c"}
 	return t
 }
@@ -88,7 +88,7 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
 		NewTileProviderStamenToner(),
-        NewTileProviderOpenTopoMap()}
+		NewTileProviderOpenTopoMap()}
 
 	for _, tp := range list {
 		m[tp.Name] = tp
