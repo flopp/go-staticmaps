@@ -67,6 +67,17 @@ func NewTileProviderStamenToner() *TileProvider {
 	return t
 }
 
+// NewTileProviderOpenTopoMap creates a TileProvider struct for opentopomaps's tile service
+func NewTileProviderOpenTopoMap() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "opentopomap"
+	t.Attribution = "Maps (c) OpenTopoMap [CC-BY-SA]; Data (c) OSM and contributors [ODbL]; Data (c) SRTM"
+	t.TileSize = 256
+	t.URLPattern = "http://%[1].tile.opentopomap.org/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c"}
+	return t
+}
+
 // GetTileProviders returns a map of all available TileProviders
 func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
@@ -76,7 +87,8 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderThunderforestLandscape(),
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
-		NewTileProviderStamenToner()}
+		NewTileProviderStamenToner(),
+        NewTileProviderOpenTopoMap()}
 
 	for _, tp := range list {
 		m[tp.Name] = tp
