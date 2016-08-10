@@ -1,5 +1,5 @@
 [![GoDoc](https://godoc.org/github.com/flopp/go-staticmaps?status.svg)](https://godoc.org/github.com/flopp/go-staticmaps)
-[![Go Report Card](http://goreportcard.com/badge/flopp/go-staticmaps)](http://goreportcard.com/report/flopp/go-staticmaps)
+[![Go Report Card](https://goreportcard.com/badge/github.com/flopp/go-staticmaps)](https://goreportcard.com/report/flopp/go-staticmaps)
 [![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/flopp/go-staticmaps/)
 
 # go-staticmaps
