@@ -195,7 +195,10 @@ Besides the go standard library, go-staticmaps uses
 - [gpxgo](github.com/tkrajina/gpxgo) for loading GPX files
 - [go-coordsparser](https://github.com/flopp/go-coordsparser) for parsing geo coordinates
 
+## Contributors
+- [felix](https://github.com/felix): additional tile servers
+
 ## License
-Copyright 2016 Florian Pigorsch. All rights reserved.
+Copyright 2016 Florian Pigorsch & Contributors. All rights reserved.
 
 Use of this source code is governed by a MIT-style license that can be found in the LICENSE file.
