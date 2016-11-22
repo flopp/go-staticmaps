@@ -20,14 +20,14 @@ func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
 }
 
-// NewTileProviderMapQuest creates a TileProvider struct for mapquest's tile service
-func NewTileProviderMapQuest() *TileProvider {
+// NewTileProviderOpenStreetMaps creates a TileProvider struct for OSM's tile service
+func NewTileProviderOpenStreetMaps() *TileProvider {
 	t := new(TileProvider)
-	t.Name = "mapquest"
-	t.Attribution = "Maps (c) MapQuest; Data (c) OSM and contributors, ODbL"
+	t.Name = "osm"
+	t.Attribution = "Maps and Data (c) openstreetmaps.org and contributors, ODbL"
 	t.TileSize = 256
-	t.URLPattern = "http://otile%[1]s.mqcdn.com/tiles/1.0.0/osm/%[2]d/%[3]d/%[4]d.png"
-	t.Shards = []string{"1", "2", "3", "4"}
+	t.URLPattern = "http://%[1]s.tile.openstreemaps.org/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c"}
 	return t
 }
 
@@ -78,17 +78,61 @@ func NewTileProviderOpenTopoMap() *TileProvider {
 	return t
 }
 
+func NewTileProviderWikimedia() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "wikimedia"
+	t.Attribution = "Map (c) Wikimedia; Data (c) OSM and contributers, ODbL."
+	t.TileSize = 256
+	t.URLPattern = "https://maps.wikimedia.org/osm-intl/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{}
+	return t
+}
+
+func NewTileProviderOpenCycleMap() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "cycle"
+	t.Attribution = "Maps and Data (c) openstreetmaps.org and contributors, ODbL"
+	t.TileSize = 256
+	t.URLPattern = "http://%[1]s.tile.opencyclemap.org/cycle/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b"}
+	return t
+}
+
+func newTileProviderCarto(name string) *TileProvider {
+	t := new(TileProvider)
+	t.Name = fmt.Sprintf("carto-%s", name)
+	t.Attribution = "Map (c) Carto [CC BY 3.0] Data (c) OSM and contributers, ODbL."
+	t.TileSize = 256
+	t.URLPattern = "https://cartodb-basemaps-%[1]s.global.ssl.fastly.net/" + name + "_all/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c", "d"}
+	return t
+}
+
+func NewTileProviderCartoLight() *TileProvider {
+	return newTileProviderCarto("light")
+}
+
+func NewTileProviderCartoDark() *TileProvider {
+	return newTileProviderCarto("dark")
+}
+
 // GetTileProviders returns a map of all available TileProviders
 func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
 
 	list := []*TileProvider{
-		NewTileProviderMapQuest(),
+		NewTileProviderOpenStreetMaps(),
+		NewTileProviderOpenCycleMap(),
 		NewTileProviderThunderforestLandscape(),
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
 		NewTileProviderStamenToner(),
-		NewTileProviderOpenTopoMap()}
+		NewTileProviderOpenTopoMap(),
+		NewTileProviderOpenStreetMaps(),
+		NewTileProviderOpenCycleMap(),
+		NewTileProviderCartoLight(),
+		NewTileProviderCartoDark(),
+	}
 
 	for _, tp := range list {
 		m[tp.Name] = tp
