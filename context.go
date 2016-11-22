@@ -41,7 +41,7 @@ func NewContext() *Context {
 	t.height = 512
 	t.hasZoom = false
 	t.hasCenter = false
-	t.tileProvider = NewTileProviderMapQuest()
+	t.tileProvider = NewTileProviderOpenStreetMaps()
 	return t
 }
 
