@@ -67,6 +67,18 @@ func NewTileProviderStamenToner() *TileProvider {
 	return t
 }
 
+// NewTileProviderStamenTerrain creates a TileProvider struct for stamens' 'terrain' tile service
+func NewTileProviderStamenTerrain() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "stamen-terrain"
+	t.Attribution = "Maps (c) Stamen; Data (c) OSM and contributors, ODbL"
+	t.TileSize = 256
+	t.URLPattern = "http://%[1]s.tile.stamen.com/terrain/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c", "d"}
+	return t
+}
+
+
 // NewTileProviderOpenTopoMap creates a TileProvider struct for opentopomaps's tile service
 func NewTileProviderOpenTopoMap() *TileProvider {
 	t := new(TileProvider)
@@ -127,6 +139,7 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
 		NewTileProviderStamenToner(),
+        NewTileProviderStamenTerrain(),
 		NewTileProviderOpenTopoMap(),
 		NewTileProviderOpenStreetMaps(),
 		NewTileProviderOpenCycleMap(),
