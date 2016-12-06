@@ -10,6 +10,7 @@ import (
 	"errors"
 	"image"
 	"image/draw"
+	"log"
 	"math"
 
 	"github.com/fogleman/gg"
@@ -242,6 +243,8 @@ func (m *Context) Render() (image.Image, error) {
 			y := trans.tOriginY + yy
 			if tileImg, err := t.Fetch(zoom, x, y); err == nil {
 				gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
+			} else {
+				log.Printf("Error downloading tile file: %s", err)
 			}
 		}
 	}

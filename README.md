@@ -22,6 +22,13 @@ Installing go-staticmaps is as easy as
 go get -u github.com/flopp/go-staticmaps
 ```
 
+For the command line tool, use
+```bash
+go get -u github.com/flopp/go-staticmaps/create-static-map
+```
+
+Of course, your local Go installation must be setup up properly.
+
 ### Library Usage
 
 Create a 400x300 pixel map with a red marker:

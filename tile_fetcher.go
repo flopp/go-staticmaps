@@ -89,11 +89,11 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 
 func (t *TileFetcher) download(url string) ([]byte, error) {
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer resp.Body.Close()
 
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
