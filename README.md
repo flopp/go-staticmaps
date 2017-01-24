@@ -99,6 +99,8 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 - `color:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `red`)
 - `size:SIZE` - where `SIZE` is one of `mid`, `small`, `tiny`, or some number > 0 (default: `mid`)
 - `label:LABEL` - where `LABEL` is an alpha numeric character, i.e. `A`-`Z`, `a`-`z`, `0`-`9`; (default: no label)
+- `labelcolor:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `black` or `white`, depending on the marker color)
+
 
 ### Paths
 The `--path` option defines a path on the map. Use multiple `--path` options to add multiple paths to the map.
@@ -148,7 +150,7 @@ $ create-static-map --width 600 --height 400 -o map2.png -z 14 -m "52.514536,13.
 A map with two markers (red and green). If there are more than two markers in the map, a *good* zoom level can be determined automatically:
 
 ```bash
-$ create-static-map --width 600 --height 400 -o map3.png -m "red|52.514536,13.350151" -m "green|52.516285,13.377746"
+$ create-static-map --width 600 --height 400 -o map3.png -m "color:red|52.514536,13.350151" -m "color:green|52.516285,13.377746"
 ```
 
 ![Example 3](https://raw.githubusercontent.com/flopp/flopp.github.io/master/go-staticmaps/map3.png)
@@ -203,10 +205,10 @@ Besides the go standard library, go-staticmaps uses
 - [go-coordsparser](https://github.com/flopp/go-coordsparser) for parsing geo coordinates
 
 ## Contributors
-- [Kooper](https://github.com/Kooper): library usage example fixes 
+- [Kooper](https://github.com/Kooper): library usage example fixes
 - [felix](https://github.com/felix): additional tile servers
 
 ## License
-Copyright 2016 Florian Pigorsch & Contributors. All rights reserved.
+Copyright 2016, 2017 Florian Pigorsch & Contributors. All rights reserved.
 
 Use of this source code is governed by a MIT-style license that can be found in the LICENSE file.

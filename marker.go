@@ -1,4 +1,4 @@
-// Copyright 2016 Florian Pigorsch. All rights reserved.
+// Copyright 2016, 2017 Florian Pigorsch. All rights reserved.
 //
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
@@ -20,10 +20,11 @@ import (
 // Marker represents a marker on the map
 type Marker struct {
 	MapObject
-	Position s2.LatLng
-	Color    color.Color
-	Size     float64
-	Label    string
+	Position   s2.LatLng
+	Color      color.Color
+	Size       float64
+	Label      string
+	LabelColor color.Color
 }
 
 // NewMarker creates a new Marker
@@ -33,6 +34,11 @@ func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	m.Color = col
 	m.Size = size
 	m.Label = ""
+	if Luminance(m.Color) >= 0.5 {
+		m.LabelColor = color.RGBA{0x00, 0x00, 0x00, 0xff}
+	} else {
+		m.LabelColor = color.RGBA{0xff, 0xff, 0xff, 0xff}
+	}
 	return m
 }
 
@@ -57,14 +63,15 @@ func parseSizeString(s string) (float64, error) {
 func ParseMarkerString(s string) ([]*Marker, error) {
 	markers := make([]*Marker, 0, 0)
 
-	var color color.Color = color.RGBA{0xff, 0, 0, 0xff}
+	var markerColor color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
 	label := ""
+	var labelColor color.Color = nil
 
 	for _, ss := range strings.Split(s, "|") {
 		if ok, suffix := hasPrefix(ss, "color:"); ok {
 			var err error
-			color, err = ParseColorString(suffix)
+			markerColor, err = ParseColorString(suffix)
 			if err != nil {
 				return nil, err
 			}
@@ -76,17 +83,31 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			if err != nil {
 				return nil, err
 			}
+		} else if ok, suffix := hasPrefix(ss, "labelcolor:"); ok {
+			var err error
+			labelColor, err = ParseColorString(suffix)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
 				return nil, err
 			}
-			m := NewMarker(s2.LatLngFromDegrees(lat, lng), color, size)
+			m := NewMarker(s2.LatLngFromDegrees(lat, lng), markerColor, size)
 			m.Label = label
+			if labelColor != nil {
+				m.setLabelColor(labelColor)
+			}
 			markers = append(markers, m)
 		}
 	}
 	return markers, nil
+}
+
+// SetLabelColor sets the color of the marker's text label
+func (m *Marker) SetLabelColor(col color.Color) {
+	m.LabelColor = col
 }
 
 func (m *Marker) extraMarginPixels() float64 {
@@ -115,11 +136,7 @@ func (m *Marker) draw(gc *gg.Context, trans *transformer) {
 	gc.Stroke()
 
 	if m.Label != "" {
-		if Luminance(m.Color) >= 0.5 {
-			gc.SetColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
-		} else {
-			gc.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-		}
+		gc.SetColor(m.LabelColor)
 		gc.DrawStringAnchored(m.Label, x, y-m.Size, 0.5, 0.5)
 	}
 }
