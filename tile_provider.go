@@ -78,7 +78,6 @@ func NewTileProviderStamenTerrain() *TileProvider {
 	return t
 }
 
-
 // NewTileProviderOpenTopoMap creates a TileProvider struct for opentopomaps's tile service
 func NewTileProviderOpenTopoMap() *TileProvider {
 	t := new(TileProvider)
@@ -139,7 +138,7 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
 		NewTileProviderStamenToner(),
-        NewTileProviderStamenTerrain(),
+		NewTileProviderStamenTerrain(),
 		NewTileProviderOpenTopoMap(),
 		NewTileProviderOpenStreetMaps(),
 		NewTileProviderOpenCycleMap(),

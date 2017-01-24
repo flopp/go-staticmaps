@@ -93,6 +93,10 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 		return nil, err
 	}
 
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("GET %s: %s", url, resp.Status)
+	}
+
 	defer resp.Body.Close()
 
 	contents, err := ioutil.ReadAll(resp.Body)
