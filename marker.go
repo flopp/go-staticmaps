@@ -66,7 +66,7 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 	var markerColor color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
 	label := ""
-	var labelColor color.Color = nil
+	var labelColor color.Color
 
 	for _, ss := range strings.Split(s, "|") {
 		if ok, suffix := hasPrefix(ss, "color:"); ok {

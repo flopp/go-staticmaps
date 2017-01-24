@@ -78,7 +78,7 @@ func NewTileProviderStamenTerrain() *TileProvider {
 	return t
 }
 
-// NewTileProviderOpenTopoMap creates a TileProvider struct for opentopomaps's tile service
+// NewTileProviderOpenTopoMap creates a TileProvider struct for opentopomap's tile service
 func NewTileProviderOpenTopoMap() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "opentopomap"
@@ -89,16 +89,18 @@ func NewTileProviderOpenTopoMap() *TileProvider {
 	return t
 }
 
+// NewTileProviderWikimedia creates a TileProvider struct for Wikimedia's tile service
 func NewTileProviderWikimedia() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "wikimedia"
-	t.Attribution = "Map (c) Wikimedia; Data (c) OSM and contributers, ODbL."
+	t.Attribution = "Map (c) Wikimedia; Data (c) OSM and contributors, ODbL."
 	t.TileSize = 256
 	t.URLPattern = "https://maps.wikimedia.org/osm-intl/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{}
 	return t
 }
 
+// NewTileProviderOpenCycleMap creates a TileProvider struct for OpenCycleMap's tile service
 func NewTileProviderOpenCycleMap() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "cycle"
@@ -112,17 +114,19 @@ func NewTileProviderOpenCycleMap() *TileProvider {
 func newTileProviderCarto(name string) *TileProvider {
 	t := new(TileProvider)
 	t.Name = fmt.Sprintf("carto-%s", name)
-	t.Attribution = "Map (c) Carto [CC BY 3.0] Data (c) OSM and contributers, ODbL."
+	t.Attribution = "Map (c) Carto [CC BY 3.0] Data (c) OSM and contributors, ODbL."
 	t.TileSize = 256
 	t.URLPattern = "https://cartodb-basemaps-%[1]s.global.ssl.fastly.net/" + name + "_all/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c", "d"}
 	return t
 }
 
+// NewTileProviderCartoLight creates a TileProvider struct for Carto's tile service (light variant)
 func NewTileProviderCartoLight() *TileProvider {
 	return newTileProviderCarto("light")
 }
 
+// NewTileProviderCartoDark creates a TileProvider struct for Carto's tile service (dark variant)
 func NewTileProviderCartoDark() *TileProvider {
 	return newTileProviderCarto("dark")
 }
