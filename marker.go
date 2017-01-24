@@ -97,7 +97,7 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			m := NewMarker(s2.LatLngFromDegrees(lat, lng), markerColor, size)
 			m.Label = label
 			if labelColor != nil {
-				m.setLabelColor(labelColor)
+				m.SetLabelColor(labelColor)
 			}
 			markers = append(markers, m)
 		}
