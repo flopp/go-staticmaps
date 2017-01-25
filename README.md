@@ -206,8 +206,10 @@ Besides the go standard library, go-staticmaps uses
 - [go-coordsparser](https://github.com/flopp/go-coordsparser) for parsing geo coordinates
 
 ## Contributors
-- [Kooper](https://github.com/Kooper): library usage example fixes
-- [felix](https://github.com/felix): additional tile servers
+- [Kooper](https://github.com/Kooper): fixed *library usage examples*
+- [felix](https://github.com/felix): added *more tile servers*
+- [wiless](https://github.com/wiless): suggested to add user definable *marker label colors*
+- [noki](https://github.com/Noki): suggested to add a user definable *bounding box*
 
 ## License
 Copyright 2016, 2017 Florian Pigorsch & Contributors. All rights reserved.
