@@ -180,16 +180,14 @@ func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
 	} else if m.hasCenter {
 		if m.hasZoom {
 			return m.zoom, m.center, nil
-		} else {
-			return m.determineZoom(bounds, m.center), m.center, nil
 		}
+		return m.determineZoom(bounds, m.center), m.center, nil
 	} else if !bounds.IsEmpty() {
 		center := bounds.Center()
 		if m.hasZoom {
 			return m.zoom, center, nil
-		} else {
-			return m.determineZoom(bounds, center), center, nil
 		}
+		return m.determineZoom(bounds, center), center, nil
 	}
 
 	return 0, s2.LatLngFromDegrees(0, 0), errors.New("Cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")

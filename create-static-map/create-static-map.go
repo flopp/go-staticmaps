@@ -19,15 +19,16 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-func getTileProviderOrExit(name string) *sm.TileProvider {
+func handleTypeOption(ctx *sm.Context, parameter string) {
 	tileProviders := sm.GetTileProviders()
-	tp := tileProviders[name]
+	tp := tileProviders[parameter]
 	if tp != nil {
-		return tp
+		ctx.SetTileProvider(tp)
+		return
 	}
 
-	if name != "list" {
-		fmt.Println("Bad map type:", name)
+	if parameter != "list" {
+		fmt.Println("Bad map type:", parameter)
 	}
 	fmt.Println("Possible map types (to be used with --type/-t):")
 	// print sorted keys
@@ -40,8 +41,78 @@ func getTileProviderOrExit(name string) *sm.TileProvider {
 		fmt.Println(k)
 	}
 	os.Exit(0)
+}
 
-	return nil
+func handleCenterOption(ctx *sm.Context, parameter string) {
+	lat, lng, err := coordsparser.Parse(parameter)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		ctx.SetCenter(s2.LatLngFromDegrees(lat, lng))
+	}
+}
+
+func handleBboxOption(ctx *sm.Context, parameter string) {
+	pair := strings.Split(parameter, "|")
+	if len(pair) != 2 {
+		log.Fatalf("Bad LATLNG|LATLNG pair: %s", parameter)
+	}
+
+	bbox := s2.EmptyRect()
+
+	lat, lng, err := coordsparser.Parse(pair[0])
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
+	}
+
+	lat, lng, err = coordsparser.Parse(pair[1])
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
+	}
+
+	ctx.SetBoundingBox(bbox)
+}
+
+func handleMarkersOption(ctx *sm.Context, parameters []string) {
+	for _, s := range parameters {
+		markers, err := sm.ParseMarkerString(s)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			for _, marker := range markers {
+				ctx.AddMarker(marker)
+			}
+		}
+	}
+}
+
+func handlePathsOption(ctx *sm.Context, parameters []string) {
+	for _, s := range parameters {
+		paths, err := sm.ParsePathString(s)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			for _, path := range paths {
+				ctx.AddPath(path)
+			}
+		}
+	}
+}
+
+func handleAreasOption(ctx *sm.Context, parameters []string) {
+	for _, s := range parameters {
+		area, err := sm.ParseAreaString(s)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			ctx.AddArea(area)
+		}
+	}
+
 }
 
 func main() {
@@ -71,10 +142,7 @@ func main() {
 	ctx := sm.NewContext()
 
 	if parser.FindOptionByLongName("type").IsSet() {
-		tp := getTileProviderOrExit(opts.Type)
-		if tp != nil {
-			ctx.SetTileProvider(tp)
-		}
+		handleTypeOption(ctx, opts.Type)
 	}
 
 	ctx.SetSize(opts.Width, opts.Height)
@@ -84,78 +152,23 @@ func main() {
 	}
 
 	if parser.FindOptionByLongName("center").IsSet() {
-		lat, lng, err := coordsparser.Parse(opts.Center)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			ctx.SetCenter(s2.LatLngFromDegrees(lat, lng))
-		}
+		handleCenterOption(ctx, opts.Center)
 	}
 
 	if parser.FindOptionByLongName("bbox").IsSet() {
-		pair := strings.Split(opts.BBox, "|")
-		if len(pair) != 2 {
-			log.Fatalf("Bad LATLNG|LATLNG pair: %s", opts.BBox)
-		}
-
-		bbox := s2.EmptyRect()
-
-		lat, lng, err := coordsparser.Parse(pair[0])
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
-		}
-
-		lat, lng, err = coordsparser.Parse(pair[1])
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
-		}
-
-		ctx.SetBoundingBox(bbox)
+		handleBboxOption(ctx, opts.BBox)
 	}
 
-	for _, markerString := range opts.Markers {
-		markers, err := sm.ParseMarkerString(markerString)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			for _, marker := range markers {
-				ctx.AddMarker(marker)
-			}
-		}
-	}
-
-	for _, pathString := range opts.Paths {
-		paths, err := sm.ParsePathString(pathString)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			for _, path := range paths {
-				ctx.AddPath(path)
-			}
-		}
-	}
-
-	for _, areaString := range opts.Areas {
-		area, err := sm.ParseAreaString(areaString)
-		if err != nil {
-			log.Fatal(err)
-		} else {
-			ctx.AddArea(area)
-		}
-	}
+	handleMarkersOption(ctx, opts.Markers)
+	handlePathsOption(ctx, opts.Paths)
+	handleAreasOption(ctx, opts.Areas)
 
 	img, err := ctx.Render()
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	if err = gg.SavePNG(opts.Output, img); err != nil {
 		log.Fatal(err)
-		return
 	}
 }
