@@ -76,6 +76,7 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps) for a c
       -t, --type=MAPTYPE       Select the map type; list possible map types with '--type list'
       -c, --center=LATLNG      Center coordinates (lat,lng) of the static map
       -z, --zoom=ZOOMLEVEL     Zoom factor
+      -b, --bbox=LATLNG|LATLNG Set the bounding box (the given coordinates pair must be opposite corners of a rectangle)
       -m, --marker=MARKER      Add a marker to the static map
       -p, --path=PATH          Add a path to the static map
       -a, --area=AREA          Add an area to the static map
@@ -85,7 +86,7 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps) for a c
 
 ### General
 The command line interface tries to resemble [Google's Static Maps API](https://developers.google.com/maps/documentation/static-maps/intro).
-If `--center` or `--zoom` are not given, *good* values are determined from the specified markers and paths.
+If neither `--bbox`, `--center`, nor `--zoom` are given, the map extent is determined from the specified markers, paths and areas.
 
 ### Markers
 The `--marker` option defines one or more map markers of the same style. Use multiple `--marker` options to add markers of different styles.

@@ -28,6 +28,9 @@ type Context struct {
 	hasCenter bool
 	center    s2.LatLng
 
+	hasBoundingBox bool
+	boundingBox    s2.Rect
+
 	markers []*Marker
 	paths   []*Path
 	areas   []*Area
@@ -42,6 +45,7 @@ func NewContext() *Context {
 	t.height = 512
 	t.hasZoom = false
 	t.hasCenter = false
+	t.hasBoundingBox = false
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	return t
 }
@@ -67,6 +71,12 @@ func (m *Context) SetZoom(zoom int) {
 func (m *Context) SetCenter(center s2.LatLng) {
 	m.center = center
 	m.hasCenter = true
+}
+
+// SetBoundingBox sets the bounding box
+func (m *Context) SetBoundingBox(bbox s2.Rect) {
+	m.boundingBox = bbox
+	m.hasBoundingBox = true
 }
 
 // AddMarker adds a marker to the Context
@@ -162,6 +172,29 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	return 15
 }
 
+func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
+	bounds := m.determineBounds()
+	if m.hasBoundingBox && !m.boundingBox.IsEmpty() {
+		center := m.boundingBox.Center()
+		return m.determineZoom(m.boundingBox, center), center, nil
+	} else if m.hasCenter {
+		if m.hasZoom {
+			return m.zoom, m.center, nil
+		} else {
+			return m.determineZoom(bounds, m.center), m.center, nil
+		}
+	} else if !bounds.IsEmpty() {
+		center := bounds.Center()
+		if m.hasZoom {
+			return m.zoom, center, nil
+		} else {
+			return m.determineZoom(bounds, center), center, nil
+		}
+	}
+
+	return 0, s2.LatLngFromDegrees(0, 0), errors.New("Cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")
+}
+
 type transformer struct {
 	zoom               int
 	tileSize           int
@@ -212,19 +245,9 @@ func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
 
 // Render actually renders the map image including all map objects (markers, paths, areas)
 func (m *Context) Render() (image.Image, error) {
-	bounds := m.determineBounds()
-
-	center := m.center
-	if !m.hasCenter {
-		if bounds.IsEmpty() {
-			return nil, errors.New("No center coordinates specified, cannot determine center from markers")
-		}
-		center = bounds.Center()
-	}
-
-	zoom := m.zoom
-	if !m.hasZoom {
-		zoom = m.determineZoom(bounds, center)
+	zoom, center, err := m.determineZoomCenter()
+	if err != nil {
+		return nil, err
 	}
 
 	tileSize := m.tileProvider.TileSize

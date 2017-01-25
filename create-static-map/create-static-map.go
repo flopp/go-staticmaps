@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/flopp/go-coordsparser"
 	"github.com/flopp/go-staticmaps"
@@ -52,6 +53,7 @@ func main() {
 		Type    string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
 		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
 		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
+		BBox    string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"LATLNG|LATLNG"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths   []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas   []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
@@ -88,6 +90,31 @@ func main() {
 		} else {
 			ctx.SetCenter(s2.LatLngFromDegrees(lat, lng))
 		}
+	}
+
+	if parser.FindOptionByLongName("bbox").IsSet() {
+		pair := strings.Split(opts.BBox, "|")
+		if len(pair) != 2 {
+			log.Fatalf("Bad LATLNG|LATLNG pair: %s", opts.BBox)
+		}
+
+		bbox := s2.EmptyRect()
+
+		lat, lng, err := coordsparser.Parse(pair[0])
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
+		}
+
+		lat, lng, err = coordsparser.Parse(pair[1])
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
+		}
+
+		ctx.SetBoundingBox(bbox)
 	}
 
 	for _, markerString := range opts.Markers {
