@@ -59,7 +59,7 @@ func main() {
 ```
 
 
-See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps/staticmaps) for a complete documentation and the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/cmd/create-static-map/create-static-map.go) for an example how to use the package.
+See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete documentation and the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/create-static-map/create-static-map.go) for an example how to use the package.
 
 
 ### Command Line Usage
