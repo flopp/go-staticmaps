@@ -157,7 +157,14 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	maxX := (b.Hi().Lng.Degrees() + 180.0) / 360.0
 	minY := (1.0 - math.Log(math.Tan(b.Lo().Lat.Radians())+(1.0/math.Cos(b.Lo().Lat.Radians())))/math.Pi) / 2.0
 	maxY := (1.0 - math.Log(math.Tan(b.Hi().Lat.Radians())+(1.0/math.Cos(b.Hi().Lat.Radians())))/math.Pi) / 2.0
-	dx := math.Abs(maxX - minX)
+
+	dx := maxX - minX
+	for dx < 0 {
+		dx = dx + 1
+	}
+	for dx > 1 {
+		dx = dx - 1
+	}
 	dy := math.Abs(maxY - minY)
 
 	zoom := 1
@@ -236,6 +243,9 @@ func (t *transformer) ll2t(ll s2.LatLng) (float64, float64) {
 
 func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
 	x, y := t.ll2t(ll)
+	if x < float64(t.tOriginX) {
+		x = x + math.Exp2(float64(t.zoom))
+	}
 	x = float64(t.pCenterX) + (x-t.tCenterX)*float64(t.tileSize)
 	y = float64(t.pCenterY) + (y-t.tCenterY)*float64(t.tileSize)
 	return x, y
@@ -255,17 +265,24 @@ func (m *Context) Render() (image.Image, error) {
 
 	// fetch and draw tiles to img
 	t := NewTileFetcher(m.tileProvider)
+	tiles := (1 << uint(zoom))
 	for xx := 0; xx < trans.tCountX; xx++ {
 		x := trans.tOriginX + xx
 		if x < 0 {
-			x = x + (1 << uint(zoom))
+			x = x + tiles
+		} else if x >= tiles {
+			x = x - tiles
 		}
 		for yy := 0; yy < trans.tCountY; yy++ {
 			y := trans.tOriginY + yy
-			if tileImg, err := t.Fetch(zoom, x, y); err == nil {
-				gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
+			if y < 0 || y >= tiles {
+				log.Printf("Skipping out of bounds tile %d/%d", x, y)
 			} else {
-				log.Printf("Error downloading tile file: %s", err)
+				if tileImg, err := t.Fetch(zoom, x, y); err == nil {
+					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
+				} else {
+					log.Printf("Error downloading tile file: %s", err)
+				}
 			}
 		}
 	}

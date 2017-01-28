@@ -76,7 +76,10 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete doc
       -t, --type=MAPTYPE       Select the map type; list possible map types with '--type list'
       -c, --center=LATLNG      Center coordinates (lat,lng) of the static map
       -z, --zoom=ZOOMLEVEL     Zoom factor
-      -b, --bbox=LATLNG|LATLNG Set the bounding box (the given coordinates pair must be opposite corners of a rectangle)
+      -b, --bbox=NW_LATLNG|SE_LATLNG
+                               Set the bounding box (NW_LATLNG = north-western point of the
+                               bounding box, SW_LATLNG = southe-western point of the bounding
+                               box)
       -m, --marker=MARKER      Add a marker to the static map
       -p, --path=PATH          Add a path to the static map
       -a, --area=AREA          Add an area to the static map

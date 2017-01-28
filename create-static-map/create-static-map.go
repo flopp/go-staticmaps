@@ -55,26 +55,30 @@ func handleCenterOption(ctx *sm.Context, parameter string) {
 func handleBboxOption(ctx *sm.Context, parameter string) {
 	pair := strings.Split(parameter, "|")
 	if len(pair) != 2 {
-		log.Fatalf("Bad LATLNG|LATLNG pair: %s", parameter)
+		log.Fatalf("Bad NW|SE coordinates pair: %s", parameter)
 	}
 
-	bbox := s2.EmptyRect()
-
-	lat, lng, err := coordsparser.Parse(pair[0])
+	var err error
+	var nwlat float64
+	var nwlng float64
+	var selat float64
+	var selng float64
+	nwlat, nwlng, err = coordsparser.Parse(pair[0])
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
 	}
-
-	lat, lng, err = coordsparser.Parse(pair[1])
+	selat, selng, err = coordsparser.Parse(pair[1])
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		bbox = bbox.AddPoint(s2.LatLngFromDegrees(lat, lng))
 	}
 
-	ctx.SetBoundingBox(bbox)
+    var bbox s2.Rect
+	bbox, err = sm.CreateBBox(nwlat, nwlng, selat, selng)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx.SetBoundingBox(*bbox)
 }
 
 func handleMarkersOption(ctx *sm.Context, parameters []string) {
@@ -124,7 +128,7 @@ func main() {
 		Type    string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
 		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
 		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
-		BBox    string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"LATLNG|LATLNG"`
+		BBox    string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
 		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths   []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas   []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
