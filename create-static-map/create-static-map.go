@@ -72,7 +72,7 @@ func handleBboxOption(ctx *sm.Context, parameter string) {
 		log.Fatal(err)
 	}
 
-    var bbox s2.Rect
+	var bbox *s2.Rect
 	bbox, err = sm.CreateBBox(nwlat, nwlng, selat, selng)
 	if err != nil {
 		log.Fatal(err)
