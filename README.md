@@ -213,6 +213,7 @@ Besides the go standard library, go-staticmaps uses
 - [felix](https://github.com/felix): added *more tile servers*
 - [wiless](https://github.com/wiless): suggested to add user definable *marker label colors*
 - [noki](https://github.com/Noki): suggested to add a user definable *bounding box*
+- [digitocero](https://github.com/digitocero): reported and fixed *type mismatch error*
 
 ## License
 Copyright 2016, 2017 Florian Pigorsch & Contributors. All rights reserved.
