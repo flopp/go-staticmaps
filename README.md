@@ -45,7 +45,7 @@ import (
 func main() {
   ctx := sm.NewContext()
   ctx.SetSize(400, 300)
-  ctx.AddMarker(sm.NewMarker(s2.LatLngFromDegrees{52.514536, 13.350151}, color.RGBA{0xff, 0, 0, 0xff}, 16.0))
+  ctx.AddMarker(sm.NewMarker(s2.LatLngFromDegrees(52.514536, 13.350151), color.RGBA{0xff, 0, 0, 0xff}, 16.0))
 
   img, err := ctx.Render()
   if err != nil {
