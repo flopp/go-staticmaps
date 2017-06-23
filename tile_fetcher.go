@@ -21,6 +21,8 @@ import (
 	"github.com/Wessie/appdirs"
 )
 
+var TileFetcherUserAgent = "Mozilla/5.0+(compatible; go-staticmaps/0.1; https://github.com/flopp/go-staticmaps)"
+
 // TileFetcher downloads map tile images from a TileProvider
 type TileFetcher struct {
 	tileProvider *TileProvider
@@ -88,7 +90,10 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 }
 
 func (t *TileFetcher) download(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("User-Agent", TileFetcherUserAgent)
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
