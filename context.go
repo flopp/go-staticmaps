@@ -305,6 +305,9 @@ func (m *Context) Render() (image.Image, error) {
 		draw.Src)
 
 	// draw attribution
+	if m.tileProvider.Attribution == "" {
+		return croppedImg, nil
+	}
 	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
 	boxHeight := textHeight + 4.0
 	gc = gg.NewContextForRGBA(croppedImg)
