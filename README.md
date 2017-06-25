@@ -215,6 +215,9 @@ Besides the go standard library, go-staticmaps uses
 - [noki](https://github.com/Noki): suggested to add a user definable *bounding box*
 - [digitocero](https://github.com/digitocero): reported and fixed *type mismatch error*
 - [bcicen](https://github.com/bcicen): reported and fixed *syntax error in examples*
+- [pshevtsov](https://github.com/pshevtsov): fixed *drawing of empty attribution strings*
+- [Luzifer](https://github.com/Luzifer): added *overwritable user agent strings* to comply with the OSM tile usage policy 
+
 
 ## License
 Copyright 2016, 2017 Florian Pigorsch & Contributors. All rights reserved.
