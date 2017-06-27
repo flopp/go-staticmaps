@@ -9,6 +9,7 @@ package sm
 import (
 	"errors"
 	"image"
+	"image/color"
 	"image/draw"
 	"log"
 	"math"
@@ -31,6 +32,8 @@ type Context struct {
 	hasBoundingBox bool
 	boundingBox    s2.Rect
 
+	background color.Color
+
 	markers []*Marker
 	paths   []*Path
 	areas   []*Area
@@ -46,6 +49,7 @@ func NewContext() *Context {
 	t.hasZoom = false
 	t.hasCenter = false
 	t.hasBoundingBox = false
+	t.background = nil
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	return t
 }
@@ -77,6 +81,11 @@ func (m *Context) SetCenter(center s2.LatLng) {
 func (m *Context) SetBoundingBox(bbox s2.Rect) {
 	m.boundingBox = bbox
 	m.hasBoundingBox = true
+}
+
+// SetBackground sets the background color (used as a fallback for areas without map tiles)
+func (m *Context) SetBackground(col color.Color) {
+	m.background = col
 }
 
 // AddMarker adds a marker to the Context
@@ -262,6 +271,9 @@ func (m *Context) Render() (image.Image, error) {
 	trans := newTransformer(m.width, m.height, zoom, center, tileSize)
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 	gc := gg.NewContextForRGBA(img)
+	if m.background != nil {
+		draw.Draw(img, img.Bounds(), &image.Uniform{m.background}, image.ZP, draw.Src)
+	}
 
 	// fetch and draw tiles to img
 	t := NewTileFetcher(m.tileProvider)

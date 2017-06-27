@@ -54,6 +54,8 @@ func ParseColorString(s string) (color.Color, error) {
 		return color.RGBA{0xff, 0xff, 0x00, 0xff}, nil
 	case "white":
 		return color.RGBA{0xff, 0xff, 0xff, 0xff}, nil
+	case "transparent":
+		return color.RGBA{0x00, 0x00, 0x00, 0x00}, nil
 	}
 	return color.Transparent, fmt.Errorf("Cannot parse color string: %s", s)
 }

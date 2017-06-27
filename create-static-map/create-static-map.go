@@ -81,6 +81,15 @@ func handleBboxOption(ctx *sm.Context, parameter string) {
 	ctx.SetBoundingBox(*bbox)
 }
 
+func handleBackgroundOption(ctx *sm.Context, parameter string) {
+	color, err := sm.ParseColorString(parameter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx.SetBackground(color)
+}
+
 func handleMarkersOption(ctx *sm.Context, parameters []string) {
 	for _, s := range parameters {
 		markers, err := sm.ParseMarkerString(s)
@@ -122,16 +131,17 @@ func handleAreasOption(ctx *sm.Context, parameters []string) {
 func main() {
 	var opts struct {
 		//		ClearCache bool     `long:"clear-cache" description:"Clears the tile cache"`
-		Width   int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
-		Height  int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
-		Output  string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
-		Type    string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
-		Center  string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
-		Zoom    int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
-		BBox    string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
-		Markers []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
-		Paths   []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
-		Areas   []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
+		Width      int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
+		Height     int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
+		Output     string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
+		Type       string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
+		Center     string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
+		Zoom       int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
+		BBox       string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
+		Background string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
+		Markers    []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
+		Paths      []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
+		Areas      []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -161,6 +171,10 @@ func main() {
 
 	if parser.FindOptionByLongName("bbox").IsSet() {
 		handleBboxOption(ctx, opts.BBox)
+	}
+
+	if parser.FindOptionByLongName("background").IsSet() {
+		handleBackgroundOption(ctx, opts.Background)
 	}
 
 	handleMarkersOption(ctx, opts.Markers)

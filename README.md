@@ -80,6 +80,7 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete doc
                                Set the bounding box (NW_LATLNG = north-western point of the
                                bounding box, SW_LATLNG = southe-western point of the bounding
                                box)
+      --background=COLOR       Background color (default: transparent)
       -m, --marker=MARKER      Add a marker to the static map
       -p, --path=PATH          Add a path to the static map
       -a, --area=AREA          Add an area to the static map
@@ -90,6 +91,8 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete doc
 ### General
 The command line interface tries to resemble [Google's Static Maps API](https://developers.google.com/maps/documentation/static-maps/intro).
 If neither `--bbox`, `--center`, nor `--zoom` are given, the map extent is determined from the specified markers, paths and areas.
+
+`--background` lets you specify a color used for map areas that are not covered by map tiles (areas north of 85°/south of -85°).
 
 ### Markers
 The `--marker` option defines one or more map markers of the same style. Use multiple `--marker` options to add markers of different styles.
