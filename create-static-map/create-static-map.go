@@ -148,9 +148,9 @@ func main() {
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
 	parser.LongDescription = `Creates a static map`
 	_, err := parser.Parse()
-    if err != nil {
-        log.Fatal(err)
-    }
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if parser.FindOptionByLongName("help").IsSet() {
 		parser.WriteHelp(os.Stdout)
