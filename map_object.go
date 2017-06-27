@@ -16,3 +16,10 @@ type MapObject interface {
 	extraMarginPixels() float64
 	draw(dc *gg.Context, trans *transformer)
 }
+
+// CanDisplay checks if pos is generally displayable (i.e. its latitude is in [-85,85])
+func CanDisplay(pos s2.LatLng) bool {
+	const minLatitude float64 = -85.0
+	const maxLatitude float64 = 85.0
+	return (minLatitude <= pos.Lat.Degrees()) && (pos.Lat.Degrees() <= maxLatitude)
+}

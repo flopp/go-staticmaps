@@ -224,6 +224,7 @@ type transformer struct {
 	tCountX, tCountY   int
 	tCenterX, tCenterY float64
 	tOriginX, tOriginY int
+	pMinX, pMaxX       int
 }
 
 func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSize int) *transformer {
@@ -247,6 +248,9 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 	t.pCenterX = int((t.tCenterX - float64(t.tOriginX)) * float64(tileSize))
 	t.pCenterY = int((t.tCenterY - float64(t.tOriginY)) * float64(tileSize))
 
+	t.pMinX = t.pCenterX - width/2
+	t.pMaxX = t.pMinX + width
+
 	return t
 }
 
@@ -259,11 +263,19 @@ func (t *transformer) ll2t(ll s2.LatLng) (float64, float64) {
 
 func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
 	x, y := t.ll2t(ll)
-	if x < float64(t.tOriginX) {
-		x = x + math.Exp2(float64(t.zoom))
-	}
 	x = float64(t.pCenterX) + (x-t.tCenterX)*float64(t.tileSize)
 	y = float64(t.pCenterY) + (y-t.tCenterY)*float64(t.tileSize)
+
+	offset := math.Exp2(float64(t.zoom)) * float64(t.tileSize)
+	if x < float64(t.pMinX) {
+		for x < float64(t.pMinX) {
+			x = x + offset
+		}
+	} else if x >= float64(t.pMaxX) {
+		for x >= float64(t.pMaxX) {
+			x = x - offset
+		}
+	}
 	return x, y
 }
 

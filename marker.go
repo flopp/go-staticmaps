@@ -8,6 +8,7 @@ package sm
 import (
 	"fmt"
 	"image/color"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -39,6 +40,8 @@ func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	} else {
 		m.LabelColor = color.RGBA{0xff, 0xff, 0xff, 0xff}
 	}
+	m.Position = pos
+
 	return m
 }
 
@@ -121,6 +124,11 @@ func (m *Marker) bounds() s2.Rect {
 }
 
 func (m *Marker) draw(gc *gg.Context, trans *transformer) {
+	if !CanDisplay(m.Position) {
+		log.Printf("Marker coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
+		return
+	}
+
 	gc.ClearPath()
 	gc.SetLineJoin(gg.LineJoinRound)
 	gc.SetLineWidth(1.0)
