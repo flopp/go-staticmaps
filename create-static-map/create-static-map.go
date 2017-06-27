@@ -139,7 +139,7 @@ func main() {
 		Zoom       int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		BBox       string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
 		Background string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
-		UserAgent  string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" "value-name:"USERAGENT"`
+		UserAgent  string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" value-name:"USERAGENT"`
 		Markers    []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths      []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas      []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
@@ -148,6 +148,9 @@ func main() {
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
 	parser.LongDescription = `Creates a static map`
 	_, err := parser.Parse()
+    if err != nil {
+        log.Fatal(err)
+    }
 
 	if parser.FindOptionByLongName("help").IsSet() {
 		parser.WriteHelp(os.Stdout)
