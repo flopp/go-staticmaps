@@ -38,6 +38,7 @@ type Context struct {
 	paths   []*Path
 	areas   []*Area
 
+	userAgent    string
 	tileProvider *TileProvider
 }
 
@@ -50,6 +51,7 @@ func NewContext() *Context {
 	t.hasCenter = false
 	t.hasBoundingBox = false
 	t.background = nil
+	t.userAgent = ""
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	return t
 }
@@ -57,6 +59,11 @@ func NewContext() *Context {
 // SetTileProvider sets the TileProvider to be used
 func (m *Context) SetTileProvider(t *TileProvider) {
 	m.tileProvider = t
+}
+
+// SetUserAgent sets the HTTP user agent string used when downloading map tiles
+func (m *Context) SetUserAgent(a string) {
+	m.userAgent = a
 }
 
 // SetSize sets the size of the generated image
@@ -277,6 +284,10 @@ func (m *Context) Render() (image.Image, error) {
 
 	// fetch and draw tiles to img
 	t := NewTileFetcher(m.tileProvider)
+	if m.userAgent != "" {
+		t.SetUserAgent(m.userAgent)
+	}
+
 	tiles := (1 << uint(zoom))
 	for xx := 0; xx < trans.tCountX; xx++ {
 		x := trans.tOriginX + xx

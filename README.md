@@ -81,6 +81,8 @@ See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete doc
                                bounding box, SW_LATLNG = southe-western point of the bounding
                                box)
       --background=COLOR       Background color (default: transparent)
+      -u, --useragent=USERAGENT
+                               Overwrite the default HTTP user agent string
       -m, --marker=MARKER      Add a marker to the static map
       -p, --path=PATH          Add a path to the static map
       -a, --area=AREA          Add an area to the static map

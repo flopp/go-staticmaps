@@ -139,6 +139,7 @@ func main() {
 		Zoom       int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
 		BBox       string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
 		Background string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
+		UserAgent  string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" "value-name:"USERAGENT"`
 		Markers    []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths      []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas      []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
@@ -175,6 +176,10 @@ func main() {
 
 	if parser.FindOptionByLongName("background").IsSet() {
 		handleBackgroundOption(ctx, opts.Background)
+	}
+
+	if parser.FindOptionByLongName("useragent").IsSet() {
+		ctx.SetUserAgent(opts.UserAgent)
 	}
 
 	handleMarkersOption(ctx, opts.Markers)
