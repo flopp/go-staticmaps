@@ -253,7 +253,7 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 	t.pWidth = t.tCountX * tileSize
 	t.pHeight = t.tCountY * tileSize
 
-	// Pixel location in returned image for center of reqested area
+	// Pixel location in returned image for center of requested area
 	t.pCenterX = int((t.tCenterX - float64(t.tOriginX)) * float64(tileSize))
 	t.pCenterY = int((t.tCenterY - float64(t.tOriginY)) * float64(tileSize))
 
@@ -263,7 +263,7 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 	return t
 }
 
-// ll2t returns fractgional tile index for a lat/lng points
+// ll2t returns fractional tile index for a lat/lng points
 func (t *transformer) ll2t(ll s2.LatLng) (float64, float64) {
 	x := t.numTiles * (ll.Lng.Degrees() + 180.0) / 360.0
 	y := t.numTiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
@@ -379,11 +379,11 @@ func (m *Context) Render() (image.Image, error) {
 	return croppedImg, nil
 }
 
-// Render actually renders the map image including all map objects (markers, paths, areas)
-// returned image covers requested area as well as any tiles necessary to cover that area, which may
-// be alrger than the request
+// RenderWithBounds actually renders the map image including all map objects (markers, paths, areas).
+// The returned image covers requested area as well as any tiles necessary to cover that area, which may
+// be larger than the request.
 //
-// Specific bounding box of as-returned image is provided to support image registratino with other data
+// Specific bounding box of returned image is provided to support image registration with other data
 func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	zoom, center, err := m.determineZoomCenter()
 	if err != nil {

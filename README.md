@@ -222,7 +222,7 @@ Besides the go standard library, go-staticmaps uses
 - [bcicen](https://github.com/bcicen): reported and fixed *syntax error in examples*
 - [pshevtsov](https://github.com/pshevtsov): fixed *drawing of empty attribution strings*
 - [Luzifer](https://github.com/Luzifer): added *overwritable user agent strings* to comply with the OSM tile usage policy 
-
+- [Jason Fox](https://github.com/jasonpfox): added *RenderWithBounds* function
 
 ## License
 Copyright 2016, 2017 Florian Pigorsch & Contributors. All rights reserved.
