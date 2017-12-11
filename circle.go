@@ -14,10 +14,6 @@ import (
 	"github.com/golang/geo/s2"
 )
 
-const (
-	R = 6371.0
-)
-
 // Circle represents a circle on the map
 type Circle struct {
 	MapObject
@@ -29,11 +25,9 @@ type Circle struct {
 }
 
 // NewCircle creates a new circle
-func NewCircle(positon s2.LatLng,
-	col, fill color.Color,
-	radius, weight float64) *Circle {
+func NewCircle(pos s2.LatLng, col, fill color.Color, radius, weight float64) *Circle {
 	return &Circle{
-		Position: positon,
+		Position: pos,
 		Color:    col,
 		Fill:     fill,
 		Weight:   weight,
@@ -82,7 +76,10 @@ func ParseCircleString(s string) (circles []*Circle, err error) {
 }
 
 func (m *Circle) getLatLng(plus bool) s2.LatLng {
-	th := 0.001 * m.Radius / R
+	const (
+		R = 6371000.0
+	)
+	th := m.Radius / R
 	br := 0 / float64(s1.Degree)
 	if !plus {
 		th *= -1
