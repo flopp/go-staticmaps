@@ -37,6 +37,7 @@ type Context struct {
 	markers []*Marker
 	paths   []*Path
 	areas   []*Area
+	circles []*Circle
 
 	userAgent    string
 	tileProvider *TileProvider
@@ -125,6 +126,16 @@ func (m *Context) ClearAreas() {
 	m.areas = nil
 }
 
+// AddCircle adds an circle to the Context
+func (m *Context) AddCircle(circle *Circle) {
+	m.circles = append(m.circles, circle)
+}
+
+// ClearCircles removes all circles from the Context
+func (m *Context) ClearCircles() {
+	m.circles = nil
+}
+
 func (m *Context) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, marker := range m.markers {
@@ -135,6 +146,9 @@ func (m *Context) determineBounds() s2.Rect {
 	}
 	for _, area := range m.areas {
 		r = r.Union(area.bounds())
+	}
+	for _, circle := range m.circles {
+		r = r.Union(circle.bounds())
 	}
 	return r
 }
@@ -153,6 +167,11 @@ func (m *Context) determineExtraMarginPixels() float64 {
 	}
 	for _, area := range m.areas {
 		if pp := area.extraMarginPixels(); pp > p {
+			p = pp
+		}
+	}
+	for _, circle := range m.circles {
+		if pp := circle.extraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
@@ -356,6 +375,9 @@ func (m *Context) Render() (image.Image, error) {
 	for _, marker := range m.markers {
 		marker.draw(gc, trans)
 	}
+	for _, circle := range m.circles {
+		circle.draw(gc, trans)
+	}
 
 	// crop image
 	croppedImg := image.NewRGBA(image.Rect(0, 0, int(m.width), int(m.height)))
@@ -432,6 +454,9 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	}
 	for _, path := range m.paths {
 		path.draw(gc, trans)
+	}
+	for _, circle := range m.circles {
+		circle.draw(gc, trans)
 	}
 	for _, marker := range m.markers {
 		marker.draw(gc, trans)

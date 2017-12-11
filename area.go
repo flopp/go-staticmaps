@@ -57,7 +57,6 @@ func ParseAreaString(s string) (*Area, error) {
 			}
 			area.Positions = append(area.Positions, s2.LatLngFromDegrees(lat, lng))
 		}
-
 	}
 	return area, nil
 }
