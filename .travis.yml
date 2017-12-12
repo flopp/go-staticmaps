@@ -21,9 +21,9 @@ notifications:
 # flunk the build and immediately stop. It's sorta like having
 # set -e enabled in bash. 
 before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f  # All the .go files
-  - go get github.com/golang/lint/golint     # Linter
-  - go get honnef.co/go/tools/cmd/megacheck  # Badass static analyzer/linter
+  - GO_FILES=$(find . -iname '*.go' -type f)  # All the .go files
+  - go get github.com/golang/lint/golint      # Linter
+  - go get honnef.co/go/tools/cmd/megacheck   # Badass static analyzer/linter
   - go get github.com/fzipp/gocyclo
 
 # script always run to completion (set +e). All of these code checks are must haves
