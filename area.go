@@ -24,6 +24,17 @@ type Area struct {
 	Weight    float64
 }
 
+// NewArea creates a new Area
+func NewArea(positions []s2.LatLng, col color.Color, fill color.Color, weight float64) *Area {
+    a := new(Area)
+    a.Positions = positions
+    a.Color     = col
+    a.Fill      = fill
+    a.Weight    = weight
+
+    return a
+}
+
 // ParseAreaString parses a string and returns an area
 func ParseAreaString(s string) (*Area, error) {
 	area := new(Area)

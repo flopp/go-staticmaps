@@ -24,6 +24,16 @@ type Path struct {
 	Weight    float64
 }
 
+// NewPath creates a new Path
+func NewPath(positions []s2.LatLng, col color.Color, weight float64) *Path {
+    p := new(Path)
+    p.Positions = positions
+    p.Color     = col
+    p.Weight    = weight
+
+    return p
+}
+
 // ParsePathString parses a string and returns a path
 func ParsePathString(s string) ([]*Path, error) {
 	paths := make([]*Path, 0, 0)
