@@ -14,30 +14,23 @@ import (
 	"github.com/golang/geo/s2"
 )
 
-const (
-	R = 6371.0
-)
-
-// Circle represents a circles on the map
+// Circle represents a circle on the map
 type Circle struct {
 	MapObject
 	Position s2.LatLng
 	Color    color.Color
 	Fill     color.Color
-	Width    float64
+	Weight   float64
 	Radius   float64 // in m.
 }
 
-// NewCircle creates a new circles
-func NewCircle(positon s2.LatLng,
-	color,
-	fill color.Color,
-	radius, width float64) *Circle {
+// NewCircle creates a new circle
+func NewCircle(pos s2.LatLng, col, fill color.Color, radius, weight float64) *Circle {
 	return &Circle{
-		Position: positon,
-		Color:    color,
+		Position: pos,
+		Color:    col,
 		Fill:     fill,
-		Width:    width,
+		Weight:   weight,
 		Radius:   radius,
 	}
 }
@@ -45,38 +38,47 @@ func NewCircle(positon s2.LatLng,
 // ParseCircleString parses a string and returns an array of circles
 func ParseCircleString(s string) (circles []*Circle, err error) {
 	circles = make([]*Circle, 0, 0)
+
+	var col color.Color = color.RGBA{0xff, 0, 0, 0xff}
+	var fill color.Color = color.Transparent
+	radius := 100.0
+	weight := 5.0
+
 	for _, ss := range strings.Split(s, "|") {
-		circle := &Circle{}
 		if ok, suffix := hasPrefix(ss, "color:"); ok {
-			circle.Color, err = ParseColorString(suffix)
+			col, err = ParseColorString(suffix)
 			if err != nil {
-				return
+				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "fill:"); ok {
-			circle.Fill, err = ParseColorString(suffix)
+			fill, err = ParseColorString(suffix)
 			if err != nil {
-				return
+				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "radius:"); ok {
-			if circle.Radius, err = strconv.ParseFloat(suffix, 64); err != nil {
-				return
+			if radius, err = strconv.ParseFloat(suffix, 64); err != nil {
+				return nil, err
 			}
-		} else if ok, suffix := hasPrefix(ss, "width:"); ok {
-			if circle.Width, err = strconv.ParseFloat(suffix, 64); err != nil {
-				return
+		} else if ok, suffix := hasPrefix(ss, "weight:"); ok {
+			if weight, err = strconv.ParseFloat(suffix, 64); err != nil {
+				return nil, err
 			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
 				return nil, err
 			}
-			circle.Position = s2.LatLngFromDegrees(lat, lng)
+			c := NewCircle(s2.LatLngFromDegrees(lat, lng), col, fill, radius, weight)
+			circles = append(circles, c)
 		}
-		circles = append(circles, circle)
 	}
 	return circles, nil
 }
+
 func (m *Circle) getLatLng(plus bool) s2.LatLng {
+	const (
+		R = 6371000.0
+	)
 	th := m.Radius / R
 	br := 0 / float64(s1.Degree)
 	if !plus {
@@ -94,7 +96,7 @@ func (m *Circle) getLatLng(plus bool) s2.LatLng {
 }
 
 func (m *Circle) extraMarginPixels() float64 {
-	return 1.0 + 1.5*m.Radius
+	return 0.5 * m.Weight
 }
 
 func (m *Circle) bounds() s2.Rect {
@@ -109,12 +111,13 @@ func (m *Circle) draw(gc *gg.Context, trans *transformer) {
 		log.Printf("Circle coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
 		return
 	}
+
 	ll := m.getLatLng(true)
 	x, y := trans.ll2p(m.Position)
 	x1, y1 := trans.ll2p(ll)
 	radius := math.Sqrt(math.Pow(x1-x, 2) + math.Pow(y1-y, 2))
 	gc.ClearPath()
-	gc.SetLineWidth(m.Width)
+	gc.SetLineWidth(m.Weight)
 	gc.SetLineCap(gg.LineCapRound)
 	gc.SetLineJoin(gg.LineJoinRound)
 	gc.DrawCircle(x, y, radius)

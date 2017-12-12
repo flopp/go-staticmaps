@@ -125,7 +125,19 @@ func handleAreasOption(ctx *sm.Context, parameters []string) {
 			ctx.AddArea(area)
 		}
 	}
+}
 
+func handleCirclesOption(ctx *sm.Context, parameters []string) {
+	for _, s := range parameters {
+		circles, err := sm.ParseCircleString(s)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			for _, circle := range circles {
+				ctx.AddCircle(circle)
+			}
+		}
+	}
 }
 
 func main() {
@@ -143,6 +155,7 @@ func main() {
 		Markers    []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
 		Paths      []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas      []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
+		Circles    []string `short:"C" long:"circle" description:"Add a circle to the static map" value-name:"CIRCLE"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -188,6 +201,7 @@ func main() {
 	handleMarkersOption(ctx, opts.Markers)
 	handlePathsOption(ctx, opts.Paths)
 	handleAreasOption(ctx, opts.Areas)
+	handleCirclesOption(ctx, opts.Circles)
 
 	img, err := ctx.Render()
 	if err != nil {
