@@ -32,9 +32,9 @@ type Marker struct {
 func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	m := new(Marker)
 	m.Position = pos
-	m.Color    = col
-	m.Size     = size
-	m.Label    = ""
+	m.Color = col
+	m.Size = size
+	m.Label = ""
 	if Luminance(m.Color) >= 0.5 {
 		m.LabelColor = color.RGBA{0x00, 0x00, 0x00, 0xff}
 	} else {

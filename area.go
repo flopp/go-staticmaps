@@ -26,13 +26,13 @@ type Area struct {
 
 // NewArea creates a new Area
 func NewArea(positions []s2.LatLng, col color.Color, fill color.Color, weight float64) *Area {
-    a := new(Area)
-    a.Positions = positions
-    a.Color     = col
-    a.Fill      = fill
-    a.Weight    = weight
+	a := new(Area)
+	a.Positions = positions
+	a.Color = col
+	a.Fill = fill
+	a.Weight = weight
 
-    return a
+	return a
 }
 
 // ParseAreaString parses a string and returns an area
