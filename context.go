@@ -25,6 +25,8 @@ type Context struct {
 
 	hasZoom bool
 	zoom    int
+	maxZoom    int
+	minZoom    int
 
 	hasCenter bool
 	center    s2.LatLng
@@ -78,6 +80,17 @@ func (m *Context) SetZoom(zoom int) {
 	m.zoom = zoom
 	m.hasZoom = true
 }
+
+// SetMinZoom sets the min zoom level
+func (m *Context) SetMinZoom(zoom int) {
+	m.minZoom = zoom
+}
+// SetMaxZoom sets the max zoom level
+func (m *Context) SetMaxZoom(zoom int) {
+	m.maxZoom = zoom
+}
+
+
 
 // SetCenter sets the center coordinates
 func (m *Context) SetCenter(center s2.LatLng) {
@@ -202,8 +215,8 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 	dy := math.Abs(maxY - minY)
 
-	zoom := 1
-	for zoom < 30 {
+	zoom := m.minZoom
+	for zoom <= m.maxZoom {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
 			return zoom - 1
