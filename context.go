@@ -216,9 +216,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 	dy := math.Abs(maxY - minY)
 
-	var (
-		zoom int
-	)
+	var zoom int
 	for zoom = m.minZoom; zoom < m.maxZoom; zoom++ {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
