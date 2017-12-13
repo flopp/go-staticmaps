@@ -25,8 +25,8 @@ type Context struct {
 
 	hasZoom bool
 	zoom    int
-	maxZoom    int
-	minZoom    int
+	maxZoom int
+	minZoom int
 
 	hasCenter bool
 	center    s2.LatLng
@@ -55,6 +55,8 @@ func NewContext() *Context {
 	t.hasBoundingBox = false
 	t.background = nil
 	t.userAgent = ""
+	t.minZoom = 1
+	t.maxZoom = 30
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	return t
 }
@@ -85,12 +87,11 @@ func (m *Context) SetZoom(zoom int) {
 func (m *Context) SetMinZoom(zoom int) {
 	m.minZoom = zoom
 }
+
 // SetMaxZoom sets the max zoom level
 func (m *Context) SetMaxZoom(zoom int) {
 	m.maxZoom = zoom
 }
-
-
 
 // SetCenter sets the center coordinates
 func (m *Context) SetCenter(center s2.LatLng) {
@@ -215,16 +216,16 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 	dy := math.Abs(maxY - minY)
 
-	zoom := m.minZoom
-	for zoom <= m.maxZoom {
+	var (
+		zoom int
+	)
+	for zoom = m.minZoom; zoom < m.maxZoom; zoom++ {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
 			return zoom - 1
 		}
-		zoom = zoom + 1
 	}
-
-	return 15
+	return zoom
 }
 
 func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
