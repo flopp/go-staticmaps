@@ -34,10 +34,11 @@ type Context struct {
 
 	background color.Color
 
-	markers []*Marker
-	paths   []*Path
-	areas   []*Area
-	circles []*Circle
+	markers  []*Marker
+	paths    []*Path
+	areas    []*Area
+	circles  []*Circle
+	overlays []*TileProvider
 
 	userAgent    string
 	tileProvider *TileProvider
@@ -134,6 +135,16 @@ func (m *Context) AddCircle(circle *Circle) {
 // ClearCircles removes all circles from the Context
 func (m *Context) ClearCircles() {
 	m.circles = nil
+}
+
+// AddOverlay adds an overlay to the Context
+func (m *Context) AddOverlay(overlay *TileProvider) {
+	m.overlays = append(m.overlays, overlay)
+}
+
+// ClearOverlays removes all overlays from the Context
+func (m *Context) ClearOverlays() {
+	m.overlays = nil
 }
 
 func (m *Context) determineBounds() s2.Rect {
@@ -338,30 +349,14 @@ func (m *Context) Render() (image.Image, error) {
 	}
 
 	// fetch and draw tiles to img
-	t := NewTileFetcher(m.tileProvider)
-	if m.userAgent != "" {
-		t.SetUserAgent(m.userAgent)
+	layers := []*TileProvider{m.tileProvider}
+	if m.overlays != nil {
+		layers = append(layers, m.overlays...)
 	}
 
-	tiles := (1 << uint(zoom))
-	for xx := 0; xx < trans.tCountX; xx++ {
-		x := trans.tOriginX + xx
-		if x < 0 {
-			x = x + tiles
-		} else if x >= tiles {
-			x = x - tiles
-		}
-		for yy := 0; yy < trans.tCountY; yy++ {
-			y := trans.tOriginY + yy
-			if y < 0 || y >= tiles {
-				log.Printf("Skipping out of bounds tile %d/%d", x, y)
-			} else {
-				if tileImg, err := t.Fetch(zoom, x, y); err == nil {
-					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
-				} else {
-					log.Printf("Error downloading tile file: %s", err)
-				}
-			}
+	for _, layer := range layers {
+		if err := m.renderLayer(gc, zoom, trans, tileSize, layer); err != nil {
+			return nil, err
 		}
 	}
 
@@ -421,30 +416,14 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	}
 
 	// fetch and draw tiles to img
-	t := NewTileFetcher(m.tileProvider)
-	if m.userAgent != "" {
-		t.SetUserAgent(m.userAgent)
+	layers := []*TileProvider{m.tileProvider}
+	if m.overlays != nil {
+		layers = append(layers, m.overlays...)
 	}
 
-	tiles := (1 << uint(zoom))
-	for xx := 0; xx < trans.tCountX; xx++ {
-		x := trans.tOriginX + xx
-		if x < 0 {
-			x = x + tiles
-		} else if x >= tiles {
-			x = x - tiles
-		}
-		for yy := 0; yy < trans.tCountY; yy++ {
-			y := trans.tOriginY + yy
-			if y < 0 || y >= tiles {
-				log.Printf("Skipping out of bounds tile %d/%d", x, y)
-			} else {
-				if tileImg, err := t.Fetch(zoom, x, y); err == nil {
-					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
-				} else {
-					log.Printf("Error downloading tile file: %s", err)
-				}
-			}
+	for _, layer := range layers {
+		if err := m.renderLayer(gc, zoom, trans, tileSize, layer); err != nil {
+			return nil, s2.Rect{}, err
 		}
 	}
 
@@ -475,4 +454,35 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	gc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
 
 	return img, trans.Rect(), nil
+}
+
+func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tileSize int, provider *TileProvider) error {
+	t := NewTileFetcher(provider)
+	if m.userAgent != "" {
+		t.SetUserAgent(m.userAgent)
+	}
+
+	tiles := (1 << uint(zoom))
+	for xx := 0; xx < trans.tCountX; xx++ {
+		x := trans.tOriginX + xx
+		if x < 0 {
+			x = x + tiles
+		} else if x >= tiles {
+			x = x - tiles
+		}
+		for yy := 0; yy < trans.tCountY; yy++ {
+			y := trans.tOriginY + yy
+			if y < 0 || y >= tiles {
+				log.Printf("Skipping out of bounds tile %d/%d", x, y)
+			} else {
+				if tileImg, err := t.Fetch(zoom, x, y); err == nil {
+					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
+				} else {
+					log.Printf("Error downloading tile file: %s", err)
+				}
+			}
+		}
+	}
+
+	return nil
 }
