@@ -42,6 +42,8 @@ type Context struct {
 
 	userAgent    string
 	tileProvider *TileProvider
+
+	forceNoAttribution bool
 }
 
 // NewContext creates a new instance of Context
@@ -145,6 +147,14 @@ func (m *Context) AddOverlay(overlay *TileProvider) {
 // ClearOverlays removes all overlays from the Context
 func (m *Context) ClearOverlays() {
 	m.overlays = nil
+}
+
+// ForceNoAttribution disables attribution rendering
+//
+// Pay attention you might be violating the terms of usage for the
+// selected map provider - only use the function if you are aware of this!
+func (m *Context) ForceNoAttribution() {
+	m.forceNoAttribution = true
 }
 
 func (m *Context) determineBounds() s2.Rect {
@@ -381,7 +391,7 @@ func (m *Context) Render() (image.Image, error) {
 		draw.Src)
 
 	// draw attribution
-	if m.tileProvider.Attribution == "" {
+	if m.tileProvider.Attribution == "" || m.forceNoAttribution {
 		return croppedImg, nil
 	}
 	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
