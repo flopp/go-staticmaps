@@ -43,7 +43,7 @@ type Context struct {
 	userAgent    string
 	tileProvider *TileProvider
 
-	forceNoAttribution bool
+	overrideAttribution *string
 }
 
 // NewContext creates a new instance of Context
@@ -149,12 +149,12 @@ func (m *Context) ClearOverlays() {
 	m.overlays = nil
 }
 
-// ForceNoAttribution disables attribution rendering
+// OverrideAttribution sets a custom attribution string (or none if empty)
 //
 // Pay attention you might be violating the terms of usage for the
 // selected map provider - only use the function if you are aware of this!
-func (m *Context) ForceNoAttribution() {
-	m.forceNoAttribution = true
+func (m *Context) OverrideAttribution(attribution string) {
+	m.overrideAttribution = &attribution
 }
 
 func (m *Context) determineBounds() s2.Rect {
@@ -390,18 +390,23 @@ func (m *Context) Render() (image.Image, error) {
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
+	attribution := m.tileProvider.Attribution
+	if m.overrideAttribution != nil {
+		attribution = *m.overrideAttribution
+	}
+
 	// draw attribution
-	if m.tileProvider.Attribution == "" || m.forceNoAttribution {
+	if attribution == "" {
 		return croppedImg, nil
 	}
-	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
+	_, textHeight := gc.MeasureString(attribution)
 	boxHeight := textHeight + 4.0
 	gc = gg.NewContextForRGBA(croppedImg)
 	gc.SetRGBA(0.0, 0.0, 0.0, 0.5)
 	gc.DrawRectangle(0.0, float64(m.height)-boxHeight, float64(m.width), boxHeight)
 	gc.Fill()
 	gc.SetRGBA(1.0, 1.0, 1.0, 0.75)
-	gc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
+	gc.DrawString(attribution, 4.0, float64(m.height)-4.0)
 
 	return croppedImg, nil
 }
