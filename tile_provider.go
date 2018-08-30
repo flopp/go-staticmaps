@@ -7,10 +7,11 @@ package sm
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
-func fetchURL(url) ([]byte, error) {
+func fetchURL(url string) ([]byte, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -44,7 +45,7 @@ type TileProvider interface {
 	URLPattern() string
 	TileURL(int, int, int) string
 	Shards() []string
-	FetchTile() ([]byte, error)
+	FetchTile(int, int, int) ([]byte, error)
 }
 
 type DefaultTileProvider struct {
@@ -64,7 +65,7 @@ func (t *DefaultTileProvider) Attribution() string {
 	return t.attribution
 }
 
-func (t *DefaultTileProvider) TileSize() string {
+func (t *DefaultTileProvider) TileSize() int {
 	return t.tileSize
 }
 
@@ -236,7 +237,7 @@ func GetTileProviders() map[string]TileProvider {
 	}
 
 	for _, tp := range list {
-		m[tp.Name] = tp
+		m[tp.Name()] = tp
 	}
 
 	return m

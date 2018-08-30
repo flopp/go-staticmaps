@@ -12,9 +12,9 @@ import (
 	_ "image/jpeg" // to be able to decode jpegs
 	_ "image/png"  // to be able to decode pngs
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
-	"net/http"
+	//"net/http"
 	"os"
 	"path/filepath"
 
