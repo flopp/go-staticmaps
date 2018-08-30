@@ -38,10 +38,10 @@ type Context struct {
 	paths    []*Path
 	areas    []*Area
 	circles  []*Circle
-	overlays []*TileProvider
+	overlays []TileProvider
 
 	userAgent    string
-	tileProvider *TileProvider
+	tileProvider TileProvider
 
 	overrideAttribution *string
 }
@@ -61,7 +61,7 @@ func NewContext() *Context {
 }
 
 // SetTileProvider sets the TileProvider to be used
-func (m *Context) SetTileProvider(t *TileProvider) {
+func (m *Context) SetTileProvider(t TileProvider) {
 	m.tileProvider = t
 }
 
@@ -140,7 +140,7 @@ func (m *Context) ClearCircles() {
 }
 
 // AddOverlay adds an overlay to the Context
-func (m *Context) AddOverlay(overlay *TileProvider) {
+func (m *Context) AddOverlay(overlay TileProvider) {
 	m.overlays = append(m.overlays, overlay)
 }
 
@@ -205,7 +205,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 		return 15
 	}
 
-	tileSize := m.tileProvider.TileSize
+	tileSize := m.tileProvider.TileSize()
 	margin := 4.0 + m.determineExtraMarginPixels()
 	w := (float64(m.width) - 2.0*margin) / float64(tileSize)
 	h := (float64(m.height) - 2.0*margin) / float64(tileSize)
@@ -350,7 +350,7 @@ func (m *Context) Render() (image.Image, error) {
 		return nil, err
 	}
 
-	tileSize := m.tileProvider.TileSize
+	tileSize := m.tileProvider.TileSize()
 	trans := newTransformer(m.width, m.height, zoom, center, tileSize)
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 	gc := gg.NewContextForRGBA(img)
@@ -359,7 +359,7 @@ func (m *Context) Render() (image.Image, error) {
 	}
 
 	// fetch and draw tiles to img
-	layers := []*TileProvider{m.tileProvider}
+	layers := []TileProvider{m.tileProvider}
 	if m.overlays != nil {
 		layers = append(layers, m.overlays...)
 	}
@@ -390,7 +390,7 @@ func (m *Context) Render() (image.Image, error) {
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
-	attribution := m.tileProvider.Attribution
+	attribution := m.tileProvider.Attribution()
 	if m.overrideAttribution != nil {
 		attribution = *m.overrideAttribution
 	}
@@ -422,7 +422,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 		return nil, s2.Rect{}, err
 	}
 
-	tileSize := m.tileProvider.TileSize
+	tileSize := m.tileProvider.TileSize()
 	trans := newTransformer(m.width, m.height, zoom, center, tileSize)
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 	gc := gg.NewContextForRGBA(img)
@@ -431,7 +431,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	}
 
 	// fetch and draw tiles to img
-	layers := []*TileProvider{m.tileProvider}
+	layers := []TileProvider{m.tileProvider}
 	if m.overlays != nil {
 		layers = append(layers, m.overlays...)
 	}
@@ -457,21 +457,21 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	}
 
 	// draw attribution
-	if m.tileProvider.Attribution == "" {
+	if m.tileProvider.Attribution() == "" {
 		return img, trans.Rect(), nil
 	}
-	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
+	_, textHeight := gc.MeasureString(m.tileProvider.Attribution())
 	boxHeight := textHeight + 4.0
 	gc.SetRGBA(0.0, 0.0, 0.0, 0.5)
 	gc.DrawRectangle(0.0, float64(trans.pHeight)-boxHeight, float64(trans.pWidth), boxHeight)
 	gc.Fill()
 	gc.SetRGBA(1.0, 1.0, 1.0, 0.75)
-	gc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
+	gc.DrawString(m.tileProvider.Attribution(), 4.0, float64(m.height)-4.0)
 
 	return img, trans.Rect(), nil
 }
 
-func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tileSize int, provider *TileProvider) error {
+func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tileSize int, provider TileProvider) error {
 	t := NewTileFetcher(provider)
 	if m.userAgent != "" {
 		t.SetUserAgent(m.userAgent)

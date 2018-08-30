@@ -12,9 +12,9 @@ import (
 	_ "image/jpeg" // to be able to decode jpegs
 	_ "image/png"  // to be able to decode pngs
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
-	"net/http"
+	//"net/http"
 	"os"
 	"path/filepath"
 
@@ -23,14 +23,14 @@ import (
 
 // TileFetcher downloads map tile images from a TileProvider
 type TileFetcher struct {
-	tileProvider *TileProvider
+	tileProvider TileProvider
 	cacheDir     string
 	useCaching   bool
 	userAgent    string
 }
 
 // NewTileFetcher creates a new Tilefetcher struct
-func NewTileFetcher(tileProvider *TileProvider) *TileFetcher {
+func NewTileFetcher(tileProvider TileProvider) *TileFetcher {
 	t := new(TileFetcher)
 	t.tileProvider = tileProvider
 	app := appdirs.New("go-staticmaps", "flopp.net", "0.1")
@@ -45,15 +45,6 @@ func (t *TileFetcher) SetUserAgent(a string) {
 	t.userAgent = a
 }
 
-func (t *TileFetcher) url(zoom, x, y int) string {
-	shard := ""
-	ss := len(t.tileProvider.Shards)
-	if len(t.tileProvider.Shards) > 0 {
-		shard = t.tileProvider.Shards[(x+y)%ss]
-	}
-	return t.tileProvider.getURL(shard, zoom, x, y)
-}
-
 func (t *TileFetcher) cacheFileName(zoom int, x, y int) string {
 	return fmt.Sprintf("%s/%d/%d/%d", t.cacheDir, zoom, x, y)
 }
@@ -65,6 +56,7 @@ func (t *TileFetcher) ToggleCaching(enabled bool) {
 
 // Fetch download (or retrieves from the cache) a tile image for the specified zoom level and tile coordinates
 func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
+
 	if t.useCaching {
 		fileName := t.cacheFileName(zoom, x, y)
 		cachedImg, err := t.loadCache(fileName)
@@ -73,11 +65,15 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 		}
 	}
 
-	url := t.url(zoom, x, y)
-	data, err := t.download(url)
-	if err != nil {
-		return nil, err
-	}
+	data, err := t.tileProvider.FetchTile(zoom, x, y)
+
+	/*
+		url := t.url(zoom, x, y)
+		data, err := t.download(url)
+		if err != nil {
+			return nil, err
+		}
+	*/
 
 	img, _, err := image.Decode(bytes.NewBuffer(data))
 	if err != nil {
@@ -92,6 +88,17 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 	}
 
 	return img, nil
+}
+
+/*
+func (t *TileFetcher) url(zoom, x, y int) string {
+	possible_shards := t.tileProvider.Shards()
+	shard := ""
+	ss := len(possible_shards)
+	if len(possible_shards) > 0 {
+		shard = possible_shards[(x+y)%ss]
+	}
+	return t.tileProvider.URL(shard, zoom, x, y)
 }
 
 func (t *TileFetcher) download(url string) ([]byte, error) {
@@ -116,6 +123,7 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 
 	return contents, nil
 }
+*/
 
 func (t *TileFetcher) loadCache(fileName string) (image.Image, error) {
 	file, err := os.Open(fileName)
