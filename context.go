@@ -494,6 +494,7 @@ func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tile
 					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
 				} else {
 					log.Printf("Error downloading tile file: %s", err)
+					return err
 				}
 			}
 		}
