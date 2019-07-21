@@ -67,7 +67,7 @@ func (m *Context) SetTileProvider(t *TileProvider) {
 	m.tileProvider = t
 }
 
-// Set to nil to disable caching
+// SetCache takes a nil argument to disable caching
 func (m *Context) SetCache(cache TileCache) {
 	m.cache = cache
 }

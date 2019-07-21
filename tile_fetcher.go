@@ -149,7 +149,7 @@ func (t *TileFetcher) storeCache(fileName string, data []byte) error {
 	file, err := os.OpenFile(
 		fileName,
 		os.O_RDWR|os.O_CREATE|os.O_TRUNC,
-		t.cache.Perm() & 0666,
+		t.cache.Perm()&0666,
 	)
 	if err != nil {
 		return err
