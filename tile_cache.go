@@ -7,6 +7,7 @@ import (
 	"github.com/Wessie/appdirs"
 )
 
+// TileCache provides cache information to the tile fetcher
 type TileCache interface {
 	// Root path to store cached tiles in with no trailing slash.
 	Path() string
@@ -14,31 +15,34 @@ type TileCache interface {
 	Perm() os.FileMode
 }
 
-type tileCacheStaticPath struct {
+// TileCacheStaticPath provides a static path to the tile fetcher.
+type TileCacheStaticPath struct {
 	path string
 	perm os.FileMode
 }
 
-func (c *tileCacheStaticPath) Path() string {
+// Path to the cache.
+func (c *TileCacheStaticPath) Path() string {
 	return c.path
 }
 
-func (c *tileCacheStaticPath) Perm() os.FileMode {
+// Perm instructs the permission to set when creating missing cache directories.
+func (c *TileCacheStaticPath) Perm() os.FileMode {
 	return c.perm
 }
 
-// Stores cache files in a static path.
-func NewTileCache(rootPath string, perm os.FileMode) *tileCacheStaticPath {
-	return &tileCacheStaticPath{
+// NewTileCache stores cache files in a static path.
+func NewTileCache(rootPath string, perm os.FileMode) *TileCacheStaticPath {
+	return &TileCacheStaticPath{
 		path: rootPath,
 		perm: perm,
 	}
 }
 
-// Stores cache files in a user-specific cache directory.
-func NewTileCacheFromUserCache(name string, perm os.FileMode) *tileCacheStaticPath {
+// NewTileCacheFromUserCache stores cache files in a user-specific cache directory.
+func NewTileCacheFromUserCache(name string, perm os.FileMode) *TileCacheStaticPath {
 	app := appdirs.New("go-staticmaps", "flopp.net", "0.1")
-	return &tileCacheStaticPath{
+	return &TileCacheStaticPath{
 		path: fmt.Sprintf("%s/%s", app.UserCache(), name),
 		perm: perm,
 	}
