@@ -58,7 +58,7 @@ func NewContext() *Context {
 	t.background = nil
 	t.userAgent = ""
 	t.tileProvider = NewTileProviderOpenStreetMaps()
-	t.cache = NewTileCacheFromUserCache(t.tileProvider.Name, 0777)
+	t.cache = NewTileCacheFromUserCache(0777)
 	return t
 }
 

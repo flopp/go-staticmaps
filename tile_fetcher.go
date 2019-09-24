@@ -16,7 +16,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"strconv"
 )
 
 // TileFetcher downloads map tile images from a TileProvider
@@ -49,14 +51,20 @@ func (t *TileFetcher) url(zoom, x, y int) string {
 	return t.tileProvider.getURL(shard, zoom, x, y)
 }
 
-func cacheFileName(cache TileCache, zoom int, x, y int) string {
-	return fmt.Sprintf("%s/%d/%d/%d", cache.Path(), zoom, x, y)
+func cacheFileName(cache TileCache, providerName string, zoom, x, y int) string {
+	return path.Join(
+		cache.Path(),
+		providerName,
+		strconv.Itoa(zoom),
+		strconv.Itoa(x),
+		strconv.Itoa(y),
+	)
 }
 
 // Fetch download (or retrieves from the cache) a tile image for the specified zoom level and tile coordinates
 func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 	if t.cache != nil {
-		fileName := cacheFileName(t.cache, zoom, x, y)
+		fileName := cacheFileName(t.cache, t.tileProvider.Name, zoom, x, y)
 		cachedImg, err := t.loadCache(fileName)
 		if err == nil {
 			return cachedImg, nil
@@ -75,7 +83,7 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 	}
 
 	if t.cache != nil {
-		fileName := cacheFileName(t.cache, zoom, x, y)
+		fileName := cacheFileName(t.cache, t.tileProvider.Name, zoom, x, y)
 		if err := t.storeCache(fileName, data); err != nil {
 			log.Printf("Failed to store map tile as '%s': %s", fileName, err)
 		}
