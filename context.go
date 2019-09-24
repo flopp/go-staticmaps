@@ -496,13 +496,17 @@ func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tile
 			y := trans.tOriginY + yy
 			if y < 0 || y >= tiles {
 				log.Printf("Skipping out of bounds tile %d/%d", x, y)
+				continue
+			}
+
+			if tileImg, err := t.Fetch(zoom, x, y); err == nil {
+				gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
+			} else if err == errTileNotFound && provider.IgnoreNotFound {
+				log.Printf("Error downloading tile file: %s (Ignored)", err)
+				continue
 			} else {
-				if tileImg, err := t.Fetch(zoom, x, y); err == nil {
-					gc.DrawImage(tileImg, xx*tileSize, yy*tileSize)
-				} else {
-					log.Printf("Error downloading tile file: %s", err)
-					return err
-				}
+				log.Printf("Error downloading tile file: %s", err)
+				return err
 			}
 		}
 	}

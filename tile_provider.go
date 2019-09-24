@@ -9,11 +9,12 @@ import "fmt"
 
 // TileProvider encapsulates all infos about a map tile provider service (name, url scheme, attribution, etc.)
 type TileProvider struct {
-	Name        string
-	Attribution string
-	TileSize    int
-	URLPattern  string // "%[1]s" => shard, "%[2]d" => zoom, "%[3]d" => x, "%[4]d" => y
-	Shards      []string
+	Name           string
+	Attribution    string
+	IgnoreNotFound bool
+	TileSize       int
+	URLPattern     string // "%[1]s" => shard, "%[2]d" => zoom, "%[3]d" => x, "%[4]d" => y
+	Shards         []string
 }
 
 func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
