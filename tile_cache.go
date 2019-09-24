@@ -1,7 +1,6 @@
 package sm
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Wessie/appdirs"
@@ -40,10 +39,10 @@ func NewTileCache(rootPath string, perm os.FileMode) *TileCacheStaticPath {
 }
 
 // NewTileCacheFromUserCache stores cache files in a user-specific cache directory.
-func NewTileCacheFromUserCache(name string, perm os.FileMode) *TileCacheStaticPath {
+func NewTileCacheFromUserCache(perm os.FileMode) *TileCacheStaticPath {
 	app := appdirs.New("go-staticmaps", "flopp.net", "0.1")
 	return &TileCacheStaticPath{
-		path: fmt.Sprintf("%s/%s", app.UserCache(), name),
+		path: app.UserCache(),
 		perm: perm,
 	}
 }
