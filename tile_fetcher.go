@@ -7,6 +7,7 @@ package sm
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg" // to be able to decode jpegs
@@ -18,6 +19,8 @@ import (
 	"os"
 	"path/filepath"
 )
+
+var errTileNotFound = errors.New("Error 404: Tile not found")
 
 // TileFetcher downloads map tile images from a TileProvider
 type TileFetcher struct {
@@ -93,7 +96,14 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// Great! Nothing to do.
+
+	case http.StatusNotFound:
+		return nil, errTileNotFound
+
+	default:
 		return nil, fmt.Errorf("GET %s: %s", url, resp.Status)
 	}
 
