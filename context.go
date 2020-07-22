@@ -234,6 +234,9 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	for zoom < 30 {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
+			if zoom > 20 {
+				return 20
+			}
 			return zoom - 1
 		}
 		zoom = zoom + 1
