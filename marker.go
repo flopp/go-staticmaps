@@ -58,12 +58,12 @@ func parseSizeString(s string) (float64, error) {
 		return ss, nil
 	}
 
-	return 0.0, fmt.Errorf("Cannot parse size string: %s", s)
+	return 0.0, fmt.Errorf("cannot parse size string: %s", s)
 }
 
 // ParseMarkerString parses a string and returns an array of markers
 func ParseMarkerString(s string) ([]*Marker, error) {
-	markers := make([]*Marker, 0, 0)
+	markers := make([]*Marker, 0)
 
 	var markerColor color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0

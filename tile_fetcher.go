@@ -22,7 +22,7 @@ import (
 	"strconv"
 )
 
-var errTileNotFound = errors.New("Error 404: Tile not found")
+var errTileNotFound = errors.New("error 404: tile not found")
 
 // TileFetcher downloads map tile images from a TileProvider
 type TileFetcher struct {
@@ -152,7 +152,7 @@ func (t *TileFetcher) createCacheDir(path string) error {
 		return nil
 	}
 
-	return fmt.Errorf("File exists but is not a directory: %s", path)
+	return fmt.Errorf("file exists but is not a directory: %s", path)
 }
 
 func (t *TileFetcher) storeCache(fileName string, data []byte) error {

@@ -36,7 +36,7 @@ func NewPath(positions []s2.LatLng, col color.Color, weight float64) *Path {
 
 // ParsePathString parses a string and returns a path
 func ParsePathString(s string) ([]*Path, error) {
-	paths := make([]*Path, 0, 0)
+	paths := make([]*Path, 0)
 	currentPath := new(Path)
 	currentPath.Color = color.RGBA{0xff, 0, 0, 0xff}
 	currentPath.Weight = 5.0

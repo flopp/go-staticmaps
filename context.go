@@ -260,7 +260,7 @@ func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
 		return m.determineZoom(bounds, center), center, nil
 	}
 
-	return 0, s2.LatLngFromDegrees(0, 0), errors.New("Cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")
+	return 0, s2.LatLngFromDegrees(0, 0), errors.New("cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")
 }
 
 type transformer struct {
@@ -362,7 +362,7 @@ func (m *Context) Render() (image.Image, error) {
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 	gc := gg.NewContextForRGBA(img)
 	if m.background != nil {
-		draw.Draw(img, img.Bounds(), &image.Uniform{m.background}, image.ZP, draw.Src)
+		draw.Draw(img, img.Bounds(), &image.Uniform{m.background}, image.Point{}, draw.Src)
 	}
 
 	// fetch and draw tiles to img
@@ -434,7 +434,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	img := image.NewRGBA(image.Rect(0, 0, trans.pWidth, trans.pHeight))
 	gc := gg.NewContextForRGBA(img)
 	if m.background != nil {
-		draw.Draw(img, img.Bounds(), &image.Uniform{m.background}, image.ZP, draw.Src)
+		draw.Draw(img, img.Bounds(), &image.Uniform{m.background}, image.Point{}, draw.Src)
 	}
 
 	// fetch and draw tiles to img
