@@ -1,6 +1,6 @@
-[![GoDoc](https://godoc.org/github.com/flopp/go-staticmaps?status.svg)](https://godoc.org/github.com/flopp/go-staticmaps)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/flopp/go-staticmaps)](https://pkg.go.dev/github.com/flopp/go-staticmaps)
 [![Go Report Card](https://goreportcard.com/badge/github.com/flopp/go-staticmaps)](https://goreportcard.com/report/flopp/go-staticmaps)
-[![Build Status](https://travis-ci.org/flopp/go-staticmaps.svg?branch=master)](https://travis-ci.org/flopp/go-staticmaps)
+![golang/static](https://github.com/flopp/go-staticmaps/workflows/golang/static/badge.svg)
 [![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/flopp/go-staticmaps/)
 
 # go-staticmaps
@@ -60,7 +60,7 @@ func main() {
 ```
 
 
-See [GoDoc](https://godoc.org/github.com/flopp/go-staticmaps) for a complete documentation and the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/create-static-map/create-static-map.go) for an example how to use the package.
+See [PkgGoDev](https://pkg.go.dev/badge/github.com/flopp/go-staticmaps) for a complete documentation and the source code of the [command line tool](https://github.com/flopp/go-staticmaps/blob/master/create-static-map/create-static-map.go) for an example how to use the package.
 
 
 ### Command Line Usage
