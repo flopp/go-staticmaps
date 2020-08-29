@@ -37,7 +37,7 @@ func NewCircle(pos s2.LatLng, col, fill color.Color, radius, weight float64) *Ci
 
 // ParseCircleString parses a string and returns an array of circles
 func ParseCircleString(s string) (circles []*Circle, err error) {
-	circles = make([]*Circle, 0, 0)
+	circles = make([]*Circle, 0)
 
 	var col color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	var fill color.Color = color.Transparent

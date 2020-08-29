@@ -57,7 +57,7 @@ func ParseColorString(s string) (color.Color, error) {
 	case "transparent":
 		return color.RGBA{0x00, 0x00, 0x00, 0x00}, nil
 	}
-	return color.Transparent, fmt.Errorf("Cannot parse color string: %s", s)
+	return color.Transparent, fmt.Errorf("cannot parse color string '%s'", s)
 }
 
 // Luminance computes the luminance (~ brightness) of the given color. Range: 0.0 for black to 1.0 for white.

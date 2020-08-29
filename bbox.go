@@ -19,17 +19,17 @@ import (
 // lng=+-/180° by nwlng > selng.
 func CreateBBox(nwlat float64, nwlng float64, selat float64, selng float64) (*s2.Rect, error) {
 	if nwlat < -90 || nwlat > 90 {
-		return nil, fmt.Errorf("Out of range nwlat (%f) must be in [-90, 90]", nwlat)
+		return nil, fmt.Errorf("out of range nwlat (%f) must be in [-90, 90]", nwlat)
 	}
 	if nwlng < -180 || nwlng > 180 {
-		return nil, fmt.Errorf("Out of range nwlng (%f) must be in [-180, 180]", nwlng)
+		return nil, fmt.Errorf("out of range nwlng (%f) must be in [-180, 180]", nwlng)
 	}
 
 	if selat < -90 || selat > 90 {
-		return nil, fmt.Errorf("Out of range selat (%f) must be in [-90, 90]", selat)
+		return nil, fmt.Errorf("out of range selat (%f) must be in [-90, 90]", selat)
 	}
 	if selng < -180 || selng > 180 {
-		return nil, fmt.Errorf("Out of range selng (%f) must be in [-180, 180]", selng)
+		return nil, fmt.Errorf("out of range selng (%f) must be in [-180, 180]", selng)
 	}
 
 	if nwlat == selat {
