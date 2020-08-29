@@ -132,6 +132,17 @@ func NewTileProviderCartoDark() *TileProvider {
 	return newTileProviderCarto("dark")
 }
 
+// NewTileProviderArcgisWorldImagery creates a TileProvider struct for Arcgis' WorldImagery tiles
+func NewTileProviderArcgisWorldImagery() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "arcgis-worldimagery"
+	t.Attribution = "Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community"
+	t.TileSize = 256
+	t.URLPattern = "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/%[2]d/%[4]d/%[3]d"
+	t.Shards = []string{}
+	return t
+}
+
 // GetTileProviders returns a map of all available TileProviders
 func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
@@ -149,6 +160,7 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderOpenCycleMap(),
 		NewTileProviderCartoLight(),
 		NewTileProviderCartoDark(),
+		NewTileProviderArcgisWorldImagery(),
 	}
 
 	for _, tp := range list {
