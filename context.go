@@ -430,12 +430,12 @@ func (m *Context) Render() (image.Image, error) {
 	return croppedImg, nil
 }
 
-// RenderWithTransform actually renders the map image including all map objects (markers, paths, areas).
+// RenderWithTransformer actually renders the map image including all map objects (markers, paths, areas).
 // The returned image covers requested area as well as any tiles necessary to cover that area, which may
 // be larger than the request.
 //
 // A Transformer is returned to support image registration with other data.
-func (m *Context) RenderWithTransform() (image.Image, *Transformer, error) {
+func (m *Context) RenderWithTransformer() (image.Image, *Transformer, error) {
 	zoom, center, err := m.determineZoomCenter()
 	if err != nil {
 		return nil, nil, err
@@ -496,7 +496,7 @@ func (m *Context) RenderWithTransform() (image.Image, *Transformer, error) {
 //
 // Specific bounding box of returned image is provided to support image registration with other data
 func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
-	img, trans, err := m.RenderWithTransform()
+	img, trans, err := m.RenderWithTransformer()
 	if err != nil {
 		return nil, s2.Rect{}, err
 
