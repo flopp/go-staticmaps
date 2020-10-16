@@ -14,7 +14,7 @@ import (
 type MapObject interface {
 	bounds() s2.Rect
 	extraMarginPixels() float64
-	draw(dc *gg.Context, trans *transformer)
+	draw(dc *gg.Context, trans *Transformer)
 }
 
 // CanDisplay checks if pos is generally displayable (i.e. its latitude is in [-85,85])

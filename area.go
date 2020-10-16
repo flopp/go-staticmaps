@@ -84,7 +84,7 @@ func (p *Area) bounds() s2.Rect {
 	return r
 }
 
-func (p *Area) draw(gc *gg.Context, trans *transformer) {
+func (p *Area) draw(gc *gg.Context, trans *Transformer) {
 	if len(p.Positions) <= 1 {
 		return
 	}
@@ -94,7 +94,7 @@ func (p *Area) draw(gc *gg.Context, trans *transformer) {
 	gc.SetLineCap(gg.LineCapRound)
 	gc.SetLineJoin(gg.LineJoinRound)
 	for _, ll := range p.Positions {
-		gc.LineTo(trans.ll2p(ll))
+		gc.LineTo(trans.LatLngToXY(ll))
 	}
 	gc.ClosePath()
 	gc.SetColor(p.Fill)
