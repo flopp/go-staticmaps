@@ -122,7 +122,7 @@ func (m *Marker) bounds() s2.Rect {
 	return r
 }
 
-func (m *Marker) draw(gc *gg.Context, trans *transformer) {
+func (m *Marker) draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Marker coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
 		return
@@ -133,7 +133,7 @@ func (m *Marker) draw(gc *gg.Context, trans *transformer) {
 	gc.SetLineWidth(1.0)
 
 	radius := 0.5 * m.Size
-	x, y := trans.ll2p(m.Position)
+	x, y := trans.LatLngToXY(m.Position)
 	gc.DrawArc(x, y-m.Size, radius, (90.0+60.0)*math.Pi/180.0, (360.0+90.0-60.0)*math.Pi/180.0)
 	gc.LineTo(x, y)
 	gc.ClosePath()
