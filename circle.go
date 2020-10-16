@@ -106,15 +106,15 @@ func (m *Circle) bounds() s2.Rect {
 	return r
 }
 
-func (m *Circle) draw(gc *gg.Context, trans *transformer) {
+func (m *Circle) draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Circle coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
 		return
 	}
 
 	ll := m.getLatLng(true)
-	x, y := trans.ll2p(m.Position)
-	x1, y1 := trans.ll2p(ll)
+	x, y := trans.LatLngToXY(m.Position)
+	x1, y1 := trans.LatLngToXY(ll)
 	radius := math.Sqrt(math.Pow(x1-x, 2) + math.Pow(y1-y, 2))
 	gc.ClearPath()
 	gc.SetLineWidth(m.Weight)
