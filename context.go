@@ -263,7 +263,8 @@ func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
 	return 0, s2.LatLngFromDegrees(0, 0), errors.New("cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")
 }
 
-type transformer struct {
+// Transformer implements coordinate transformation from latitude longitude to image pixel coordinates.
+type Transformer struct {
 	zoom               int
 	numTiles           float64 // number of tiles per dimension at this zoom level
 	tileSize           int     // tile size in pixels from this provider
@@ -275,8 +276,18 @@ type transformer struct {
 	pMinX, pMaxX       int
 }
 
-func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSize int) *transformer {
-	t := new(transformer)
+// Transformer returns an initialized Transformer instance.
+func (m *Context) Transformer() (*Transformer, error) {
+	zoom, center, err := m.determineZoomCenter()
+	if err != nil {
+		return nil, err
+	}
+
+	return newTransformer(m.width, m.height, zoom, center, m.tileProvider.TileSize), nil
+}
+
+func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSize int) *Transformer {
+	t := new(Transformer)
 
 	t.zoom = zoom
 	t.numTiles = math.Exp2(float64(t.zoom))
@@ -311,13 +322,14 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 }
 
 // ll2t returns fractional tile index for a lat/lng points
-func (t *transformer) ll2t(ll s2.LatLng) (float64, float64) {
+func (t *Transformer) ll2t(ll s2.LatLng) (float64, float64) {
 	x := t.numTiles * (ll.Lng.Degrees() + 180.0) / 360.0
 	y := t.numTiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
 	return x, y
 }
 
-func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
+// LatLngToXY transforms a latitude longitude pair into image x, y coordinates.
+func (t *Transformer) LatLngToXY(ll s2.LatLng) (float64, float64) {
 	x, y := t.ll2t(ll)
 	x = float64(t.pCenterX) + (x-t.tCenterX)*float64(t.tileSize)
 	y = float64(t.pCenterY) + (y-t.tCenterY)*float64(t.tileSize)
@@ -335,8 +347,8 @@ func (t *transformer) ll2p(ll s2.LatLng) (float64, float64) {
 	return x, y
 }
 
-// Rect returns an s2.Rect bounding box around the set of tiles described by transformer
-func (t *transformer) Rect() (bbox s2.Rect) {
+// Rect returns an s2.Rect bounding box around the set of tiles described by Transformer.
+func (t *Transformer) Rect() (bbox s2.Rect) {
 	// transform from https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Go
 	invNumTiles := 1.0 / t.numTiles
 	// Get latitude bounds
@@ -418,15 +430,15 @@ func (m *Context) Render() (image.Image, error) {
 	return croppedImg, nil
 }
 
-// RenderWithBounds actually renders the map image including all map objects (markers, paths, areas).
+// RenderWithTransformer actually renders the map image including all map objects (markers, paths, areas).
 // The returned image covers requested area as well as any tiles necessary to cover that area, which may
 // be larger than the request.
 //
-// Specific bounding box of returned image is provided to support image registration with other data
-func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
+// A Transformer is returned to support image registration with other data.
+func (m *Context) RenderWithTransformer() (image.Image, *Transformer, error) {
 	zoom, center, err := m.determineZoomCenter()
 	if err != nil {
-		return nil, s2.Rect{}, err
+		return nil, nil, err
 	}
 
 	tileSize := m.tileProvider.TileSize
@@ -445,7 +457,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 
 	for _, layer := range layers {
 		if err := m.renderLayer(gc, zoom, trans, tileSize, layer); err != nil {
-			return nil, s2.Rect{}, err
+			return nil, nil, err
 		}
 	}
 
@@ -465,7 +477,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 
 	// draw attribution
 	if m.tileProvider.Attribution == "" {
-		return img, trans.Rect(), nil
+		return img, trans, nil
 	}
 	_, textHeight := gc.MeasureString(m.tileProvider.Attribution)
 	boxHeight := textHeight + 4.0
@@ -475,10 +487,24 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 	gc.SetRGBA(1.0, 1.0, 1.0, 0.75)
 	gc.DrawString(m.tileProvider.Attribution, 4.0, float64(m.height)-4.0)
 
+	return img, trans, nil
+}
+
+// RenderWithBounds actually renders the map image including all map objects (markers, paths, areas).
+// The returned image covers requested area as well as any tiles necessary to cover that area, which may
+// be larger than the request.
+//
+// Specific bounding box of returned image is provided to support image registration with other data
+func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
+	img, trans, err := m.RenderWithTransformer()
+	if err != nil {
+		return nil, s2.Rect{}, err
+
+	}
 	return img, trans.Rect(), nil
 }
 
-func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *transformer, tileSize int, provider *TileProvider) error {
+func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *Transformer, tileSize int, provider *TileProvider) error {
 	t := NewTileFetcher(provider, m.cache)
 	if m.userAgent != "" {
 		t.SetUserAgent(m.userAgent)
