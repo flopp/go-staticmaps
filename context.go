@@ -15,6 +15,7 @@ import (
 	"math"
 
 	"github.com/fogleman/gg"
+	"github.com/golang/geo/s1"
 	"github.com/golang/geo/s2"
 )
 
@@ -242,10 +243,21 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	return 15
 }
 
+// determineCenter computes a point that is visually centered in Mercator projection
+func (m *Context) determineCenter(bounds s2.Rect) s2.LatLng {
+	latLo := bounds.Lo().Lat.Radians()
+	latHi := bounds.Hi().Lat.Radians()
+	yLo := math.Log((1+math.Sin(latLo))/(1-math.Sin(latLo))) / 2
+	yHi := math.Log((1+math.Sin(latHi))/(1-math.Sin(latHi))) / 2
+	lat := s1.Angle(math.Atan(math.Sinh((yLo + yHi) / 2)))
+	lng := bounds.Center().Lng
+	return s2.LatLng{Lat: lat, Lng: lng}
+}
+
 func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
 	bounds := m.determineBounds()
 	if m.hasBoundingBox && !m.boundingBox.IsEmpty() {
-		center := m.boundingBox.Center()
+		center := m.determineCenter(m.boundingBox)
 		return m.determineZoom(m.boundingBox, center), center, nil
 	} else if m.hasCenter {
 		if m.hasZoom {
@@ -253,7 +265,7 @@ func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
 		}
 		return m.determineZoom(bounds, m.center), m.center, nil
 	} else if !bounds.IsEmpty() {
-		center := bounds.Center()
+		center := m.determineCenter(bounds)
 		if m.hasZoom {
 			return m.zoom, center, nil
 		}
