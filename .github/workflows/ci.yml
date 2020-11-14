@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
       - uses: actions/checkout@v2
-      - run: go get -v github.com/fzipp/gocyclo
+      - run: go get -v github.com/fzipp/gocyclo/cmd/gocyclo
       - run: $HOME/go/bin/gocyclo -over 19 $(find . -iname '*.go' -type f)
   fmt:
     name: fmt
