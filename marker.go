@@ -54,11 +54,11 @@ func parseSizeString(s string) (float64, error) {
 		return 8.0, nil
 	}
 
-	if ss, err := strconv.ParseFloat(s, 64); err != nil && ss > 0 {
-		return ss, nil
+	if float_value, err := strconv.ParseFloat(s, 64); err == nil && float_value > 0 {
+		return float_value, nil
 	}
 
-	return 0.0, fmt.Errorf("cannot parse size string: %s", s)
+	return 0.0, fmt.Errorf("cannot parse size string: '%s'", s)
 }
 
 // ParseMarkerString parses a string and returns an array of markers
