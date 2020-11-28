@@ -286,6 +286,7 @@ type Transformer struct {
 	tCenterX, tCenterY float64 // tile index to requested center
 	tOriginX, tOriginY int     // bottom left tile to download
 	pMinX, pMaxX       int
+	proj               s2.Projection
 }
 
 // Transformer returns an initialized Transformer instance.
@@ -304,6 +305,8 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 	t.zoom = zoom
 	t.numTiles = math.Exp2(float64(t.zoom))
 	t.tileSize = tileSize
+	// mercator projection from -0.5 to 0.5
+	t.proj = s2.NewMercatorProjection(0.5)
 
 	// fractional tile index to center of requested area
 	t.tCenterX, t.tCenterY = t.ll2t(llCenter)
@@ -335,9 +338,8 @@ func newTransformer(width int, height int, zoom int, llCenter s2.LatLng, tileSiz
 
 // ll2t returns fractional tile index for a lat/lng points
 func (t *Transformer) ll2t(ll s2.LatLng) (float64, float64) {
-	x := t.numTiles * (ll.Lng.Degrees() + 180.0) / 360.0
-	y := t.numTiles * (1 - math.Log(math.Tan(ll.Lat.Radians())+(1.0/math.Cos(ll.Lat.Radians())))/math.Pi) / 2.0
-	return x, y
+	p := t.proj.FromLatLng(ll)
+	return t.numTiles * (p.X + 0.5), t.numTiles * (1 - (p.Y + 0.5))
 }
 
 // LatLngToXY transforms a latitude longitude pair into image x, y coordinates.
