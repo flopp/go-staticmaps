@@ -35,10 +35,7 @@ type Context struct {
 
 	background color.Color
 
-	markers  []*Marker
-	paths    []*Path
-	areas    []*Area
-	circles  []*Circle
+	objects  []MapObject
 	overlays []*TileProvider
 
 	userAgent    string
@@ -108,43 +105,97 @@ func (m *Context) SetBackground(col color.Color) {
 }
 
 // AddMarker adds a marker to the Context
+//
+// Deprecated: AddMarker is deprecated. Use the more general AddObject.
 func (m *Context) AddMarker(marker *Marker) {
-	m.markers = append(m.markers, marker)
+	m.AddObject(marker)
 }
 
 // ClearMarkers removes all markers from the Context
 func (m *Context) ClearMarkers() {
-	m.markers = nil
+	filtered := []MapObject{}
+	for _, object := range m.objects {
+		switch object.(type) {
+        	case *Marker:
+				// skip
+			default:
+				filtered = append(filtered, object) 
+		}
+	}
+	m.objects = filtered
 }
 
 // AddPath adds a path to the Context
+//
+// Deprecated: AddPath is deprecated. Use the more general AddObject.
 func (m *Context) AddPath(path *Path) {
-	m.paths = append(m.paths, path)
+	m.AddObject(path)
 }
 
 // ClearPaths removes all paths from the Context
 func (m *Context) ClearPaths() {
-	m.paths = nil
+	filtered := []MapObject{}
+	for _, object := range m.objects {
+		switch object.(type) {
+        	case *Path:
+				// skip
+			default:
+				filtered = append(filtered, object) 
+		}
+	}
+	m.objects = filtered
 }
 
 // AddArea adds an area to the Context
+//
+// Deprecated: AddArea is deprecated. Use the more general AddObject.
 func (m *Context) AddArea(area *Area) {
-	m.areas = append(m.areas, area)
+	m.AddObject(area)
 }
 
 // ClearAreas removes all areas from the Context
 func (m *Context) ClearAreas() {
-	m.areas = nil
+	filtered := []MapObject{}
+	for _, object := range m.objects {
+		switch object.(type) {
+        	case *Area:
+				// skip
+			default:
+				filtered = append(filtered, object) 
+		}
+	}
+	m.objects = filtered
 }
 
 // AddCircle adds an circle to the Context
+//
+// Deprecated: AddCircle is deprecated. Use the more general AddObject.
 func (m *Context) AddCircle(circle *Circle) {
-	m.circles = append(m.circles, circle)
+	m.AddObject(circle)
 }
 
 // ClearCircles removes all circles from the Context
 func (m *Context) ClearCircles() {
-	m.circles = nil
+	filtered := []MapObject{}
+	for _, object := range m.objects {
+		switch object.(type) {
+        	case *Circle:
+				// skip
+			default:
+				filtered = append(filtered, object) 
+		}
+	}
+	m.objects = filtered
+}
+
+// AddObject adds an object to the Context
+func (m *Context) AddObject(object MapObject) {
+	m.objects = append(m.objects, object)
+}
+
+// ClearObjects removes all objects from the Context
+func (m *Context) ClearObjects() {
+	m.objects = nil
 }
 
 // AddOverlay adds an overlay to the Context
@@ -167,40 +218,16 @@ func (m *Context) OverrideAttribution(attribution string) {
 
 func (m *Context) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
-	for _, marker := range m.markers {
-		r = r.Union(marker.bounds())
-	}
-	for _, path := range m.paths {
-		r = r.Union(path.bounds())
-	}
-	for _, area := range m.areas {
-		r = r.Union(area.bounds())
-	}
-	for _, circle := range m.circles {
-		r = r.Union(circle.bounds())
+	for _, object := range m.objects {
+		r = r.Union(object.bounds())
 	}
 	return r
 }
 
 func (m *Context) determineExtraMarginPixels() float64 {
 	p := 0.0
-	for _, marker := range m.markers {
-		if pp := marker.extraMarginPixels(); pp > p {
-			p = pp
-		}
-	}
-	for _, path := range m.paths {
-		if pp := path.extraMarginPixels(); pp > p {
-			p = pp
-		}
-	}
-	for _, area := range m.areas {
-		if pp := area.extraMarginPixels(); pp > p {
-			p = pp
-		}
-	}
-	for _, circle := range m.circles {
-		if pp := circle.extraMarginPixels(); pp > p {
+	for _, object := range m.objects {
+		if pp := object.extraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
@@ -404,17 +431,8 @@ func (m *Context) Render() (image.Image, error) {
 	}
 
 	// draw map objects
-	for _, area := range m.areas {
-		area.draw(gc, trans)
-	}
-	for _, path := range m.paths {
-		path.draw(gc, trans)
-	}
-	for _, marker := range m.markers {
-		marker.draw(gc, trans)
-	}
-	for _, circle := range m.circles {
-		circle.draw(gc, trans)
+	for _, object := range m.objects {
+		object.draw(gc, trans)
 	}
 
 	// crop image
@@ -476,17 +494,8 @@ func (m *Context) RenderWithTransformer() (image.Image, *Transformer, error) {
 	}
 
 	// draw map objects
-	for _, area := range m.areas {
-		area.draw(gc, trans)
-	}
-	for _, path := range m.paths {
-		path.draw(gc, trans)
-	}
-	for _, circle := range m.circles {
-		circle.draw(gc, trans)
-	}
-	for _, marker := range m.markers {
-		marker.draw(gc, trans)
+	for _, object := range m.objects {
+		object.draw(gc, trans)
 	}
 
 	// draw attribution

@@ -97,7 +97,7 @@ func handleMarkersOption(ctx *sm.Context, parameters []string) {
 			log.Fatal(err)
 		} else {
 			for _, marker := range markers {
-				ctx.AddMarker(marker)
+				ctx.AddObject(marker)
 			}
 		}
 	}
@@ -110,7 +110,7 @@ func handlePathsOption(ctx *sm.Context, parameters []string) {
 			log.Fatal(err)
 		} else {
 			for _, path := range paths {
-				ctx.AddPath(path)
+				ctx.AddObject(path)
 			}
 		}
 	}
@@ -122,7 +122,7 @@ func handleAreasOption(ctx *sm.Context, parameters []string) {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			ctx.AddArea(area)
+			ctx.AddObject(area)
 		}
 	}
 }
@@ -134,7 +134,7 @@ func handleCirclesOption(ctx *sm.Context, parameters []string) {
 			log.Fatal(err)
 		} else {
 			for _, circle := range circles {
-				ctx.AddCircle(circle)
+				ctx.AddObject(circle)
 			}
 		}
 	}
@@ -198,10 +198,10 @@ func main() {
 		ctx.SetUserAgent(opts.UserAgent)
 	}
 
-	handleMarkersOption(ctx, opts.Markers)
-	handlePathsOption(ctx, opts.Paths)
 	handleAreasOption(ctx, opts.Areas)
+	handleMarkersOption(ctx, opts.Markers)
 	handleCirclesOption(ctx, opts.Circles)
+	handlePathsOption(ctx, opts.Paths)
 
 	img, err := ctx.Render()
 	if err != nil {
