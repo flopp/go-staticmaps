@@ -35,6 +35,8 @@ Of course, your local Go installation must be setup up properly.
 Create a 400x300 pixel map with a red marker:
 
 ```go
+package main
+
 import (
   "image/color"
 
@@ -50,8 +52,8 @@ func main() {
     sm.NewMarker(
       s2.LatLngFromDegrees(52.514536, 13.350151),
       color.RGBA{0xff, 0, 0, 0xff},
-      16.0
-    )
+      16.0,
+    ),
   )
 
   img, err := ctx.Render()
