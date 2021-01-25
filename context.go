@@ -116,10 +116,10 @@ func (m *Context) ClearMarkers() {
 	filtered := []MapObject{}
 	for _, object := range m.objects {
 		switch object.(type) {
-        	case *Marker:
-				// skip
-			default:
-				filtered = append(filtered, object) 
+		case *Marker:
+			// skip
+		default:
+			filtered = append(filtered, object)
 		}
 	}
 	m.objects = filtered
@@ -137,10 +137,10 @@ func (m *Context) ClearPaths() {
 	filtered := []MapObject{}
 	for _, object := range m.objects {
 		switch object.(type) {
-        	case *Path:
-				// skip
-			default:
-				filtered = append(filtered, object) 
+		case *Path:
+			// skip
+		default:
+			filtered = append(filtered, object)
 		}
 	}
 	m.objects = filtered
@@ -158,10 +158,10 @@ func (m *Context) ClearAreas() {
 	filtered := []MapObject{}
 	for _, object := range m.objects {
 		switch object.(type) {
-        	case *Area:
-				// skip
-			default:
-				filtered = append(filtered, object) 
+		case *Area:
+			// skip
+		default:
+			filtered = append(filtered, object)
 		}
 	}
 	m.objects = filtered
@@ -179,10 +179,10 @@ func (m *Context) ClearCircles() {
 	filtered := []MapObject{}
 	for _, object := range m.objects {
 		switch object.(type) {
-        	case *Circle:
-				// skip
-			default:
-				filtered = append(filtered, object) 
+		case *Circle:
+			// skip
+		default:
+			filtered = append(filtered, object)
 		}
 	}
 	m.objects = filtered
@@ -219,7 +219,7 @@ func (m *Context) OverrideAttribution(attribution string) {
 func (m *Context) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, object := range m.objects {
-		r = r.Union(object.bounds())
+		r = r.Union(object.Bounds())
 	}
 	return r
 }
@@ -227,7 +227,7 @@ func (m *Context) determineBounds() s2.Rect {
 func (m *Context) determineExtraMarginPixels() float64 {
 	p := 0.0
 	for _, object := range m.objects {
-		if pp := object.extraMarginPixels(); pp > p {
+		if pp := object.ExtraMarginPixels(); pp > p {
 			p = pp
 		}
 	}
@@ -432,7 +432,7 @@ func (m *Context) Render() (image.Image, error) {
 
 	// draw map objects
 	for _, object := range m.objects {
-		object.draw(gc, trans)
+		object.Draw(gc, trans)
 	}
 
 	// crop image
@@ -495,7 +495,7 @@ func (m *Context) RenderWithTransformer() (image.Image, *Transformer, error) {
 
 	// draw map objects
 	for _, object := range m.objects {
-		object.draw(gc, trans)
+		object.Draw(gc, trans)
 	}
 
 	// draw attribution

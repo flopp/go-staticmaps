@@ -72,11 +72,11 @@ func ParseAreaString(s string) (*Area, error) {
 	return area, nil
 }
 
-func (p *Area) extraMarginPixels() float64 {
+func (p *Area) ExtraMarginPixels() float64 {
 	return 0.5 * p.Weight
 }
 
-func (p *Area) bounds() s2.Rect {
+func (p *Area) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, ll := range p.Positions {
 		r = r.AddPoint(ll)
@@ -84,7 +84,7 @@ func (p *Area) bounds() s2.Rect {
 	return r
 }
 
-func (p *Area) draw(gc *gg.Context, trans *Transformer) {
+func (p *Area) Draw(gc *gg.Context, trans *Transformer) {
 	if len(p.Positions) <= 1 {
 		return
 	}

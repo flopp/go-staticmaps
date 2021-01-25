@@ -112,17 +112,17 @@ func (m *Marker) SetLabelColor(col color.Color) {
 	m.LabelColor = col
 }
 
-func (m *Marker) extraMarginPixels() float64 {
+func (m *Marker) ExtraMarginPixels() float64 {
 	return 1.0 + 1.5*m.Size
 }
 
-func (m *Marker) bounds() s2.Rect {
+func (m *Marker) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(m.Position)
 	return r
 }
 
-func (m *Marker) draw(gc *gg.Context, trans *Transformer) {
+func (m *Marker) Draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Marker coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
 		return

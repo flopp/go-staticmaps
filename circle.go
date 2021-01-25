@@ -95,18 +95,18 @@ func (m *Circle) getLatLng(plus bool) s2.LatLng {
 	}
 }
 
-func (m *Circle) extraMarginPixels() float64 {
+func (m *Circle) ExtraMarginPixels() float64 {
 	return 0.5 * m.Weight
 }
 
-func (m *Circle) bounds() s2.Rect {
+func (m *Circle) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(m.getLatLng(false))
 	r = r.AddPoint(m.getLatLng(true))
 	return r
 }
 
-func (m *Circle) draw(gc *gg.Context, trans *Transformer) {
+func (m *Circle) Draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Circle coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())
 		return

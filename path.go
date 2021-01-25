@@ -84,11 +84,11 @@ func ParsePathString(s string) ([]*Path, error) {
 	return paths, nil
 }
 
-func (p *Path) extraMarginPixels() float64 {
+func (p *Path) ExtraMarginPixels() float64 {
 	return 0.5 * p.Weight
 }
 
-func (p *Path) bounds() s2.Rect {
+func (p *Path) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, ll := range p.Positions {
 		r = r.AddPoint(ll)
@@ -96,7 +96,7 @@ func (p *Path) bounds() s2.Rect {
 	return r
 }
 
-func (p *Path) draw(gc *gg.Context, trans *Transformer) {
+func (p *Path) Draw(gc *gg.Context, trans *Transformer) {
 	if len(p.Positions) <= 1 {
 		return
 	}
