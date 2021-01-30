@@ -16,11 +16,11 @@ import (
 // TextMarker
 type TextMarker struct {
 	sm.MapObject
-	Position s2.LatLng
-	Text string
-	TextWidth float64
+	Position   s2.LatLng
+	Text       string
+	TextWidth  float64
 	TextHeight float64
-	TipSize float64
+	TipSize    float64
 }
 
 // NewTextMarker creates a new TextMarker
@@ -39,9 +39,9 @@ func NewTextMarker(pos s2.LatLng, text string) *TextMarker {
 }
 
 func (s *TextMarker) ExtraMarginPixels() (float64, float64, float64, float64) {
-	w := math.Max(4.0 + s.TextWidth, 2*s.TipSize)
+	w := math.Max(4.0+s.TextWidth, 2*s.TipSize)
 	h := s.TipSize + s.TextHeight + 4.0
-	return w*0.5, h, w*0.5, 0.0
+	return w * 0.5, h, w * 0.5, 0.0
 }
 
 func (s *TextMarker) Bounds() s2.Rect {
@@ -55,7 +55,7 @@ func (s *TextMarker) Draw(gc *gg.Context, trans *sm.Transformer) {
 		return
 	}
 
-	w := math.Max(4.0 + s.TextWidth, 2*s.TipSize)
+	w := math.Max(4.0+s.TextWidth, 2*s.TipSize)
 	h := s.TextHeight + 4.0
 	x, y := trans.LatLngToXY(s.Position)
 	gc.ClearPath()
@@ -76,13 +76,13 @@ func (s *TextMarker) Draw(gc *gg.Context, trans *sm.Transformer) {
 	gc.Stroke()
 
 	gc.SetRGBA(0.0, 0.0, 0.0, 1.0)
-	gc.DrawString(s.Text, x - s.TextWidth*0.5, y - s.TipSize - 4.0)
+	gc.DrawString(s.Text, x-s.TextWidth*0.5, y-s.TipSize-4.0)
 }
 
 func main() {
 	ctx := sm.NewContext()
 	ctx.SetSize(400, 300)
-	
+
 	berlin := NewTextMarker(s2.LatLngFromDegrees(52.517037, 13.388860), "Berlin")
 	london := NewTextMarker(s2.LatLngFromDegrees(51.507322, 0.127647), "London")
 	paris := NewTextMarker(s2.LatLngFromDegrees(48.856697, 2.351462), "Paris")
