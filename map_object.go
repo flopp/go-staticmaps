@@ -12,8 +12,13 @@ import (
 
 // MapObject is the interface for all objects on the map
 type MapObject interface {
+	// Bounds returns the geographical boundary rect (excluding the actual pixel dimensions).
 	Bounds() s2.Rect
-	ExtraMarginPixels() float64
+
+	// ExtraMarginPixels returns the left, top, right, bottom pixel margin of the object.
+	ExtraMarginPixels() (float64, float64, float64, float64)
+
+	// Draw draws the object in the given graphical context.
 	Draw(dc *gg.Context, trans *Transformer)
 }
 

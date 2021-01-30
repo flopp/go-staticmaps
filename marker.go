@@ -112,10 +112,12 @@ func (m *Marker) SetLabelColor(col color.Color) {
 	m.LabelColor = col
 }
 
-func (m *Marker) ExtraMarginPixels() float64 {
-	return 1.0 + 1.5*m.Size
+// ExtraMarginPixels return the marker's left, top, right, bottom pixel extent.
+func (m *Marker) ExtraMarginPixels() (float64, float64, float64, float64) {
+	return 0.5*m.Size + 1.0, 1.5*m.Size + 1.0, 0.5*m.Size + 1.0, 1.0
 }
 
+// Bounds returns single point rect containing the marker's geographical position.
 func (m *Marker) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(m.Position)

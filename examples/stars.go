@@ -27,8 +27,8 @@ func NewStar(pos s2.LatLng, size float64) *Star {
 	return s
 }
 
-func (s *Star) ExtraMarginPixels() float64 {
-	return s.Size
+func (s *Star) ExtraMarginPixels() (float64, float64, float64, float64) {
+	return s.Size * 0.5, s.Size * 0.5, s.Size * 0.5, s.Size * 0.5
 }
 
 func (s *Star) Bounds() s2.Rect {
@@ -42,15 +42,18 @@ func (s *Star) Draw(gc *gg.Context, trans *sm.Transformer) {
 		return
 	}
 
-	n := 5
 	x, y := trans.LatLngToXY(s.Position)
 	gc.ClearPath()
 	gc.SetLineWidth(1)
 	gc.SetLineCap(gg.LineCapRound)
 	gc.SetLineJoin(gg.LineJoinRound)
-	for i := 0; i < n+1; i++ {
-		a := float64((i*2)%n) * 2 * math.Pi / float64(n)
-		gc.LineTo(x+s.Size*math.Cos(a), y+s.Size*math.Sin(a))
+	for i := 0; i <= 10; i++ {
+		a := float64(i) * 2 * math.Pi / 10.0
+		if i%2 == 0 {
+			gc.LineTo(x+s.Size*math.Cos(a), y+s.Size*math.Sin(a))
+		} else {
+			gc.LineTo(x+s.Size*0.5*math.Cos(a), y+s.Size*0.5*math.Sin(a))
+		}
 	}
 	gc.SetColor(color.RGBA{0xff, 0xff, 0x00, 0xff})
 	gc.FillPreserve()

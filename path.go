@@ -84,8 +84,8 @@ func ParsePathString(s string) ([]*Path, error) {
 	return paths, nil
 }
 
-func (p *Path) ExtraMarginPixels() float64 {
-	return 0.5 * p.Weight
+func (p *Path) ExtraMarginPixels() (float64, float64, float64, float64) {
+	return p.Weight, p.Weight, p.Weight, p.Weight
 }
 
 func (p *Path) Bounds() s2.Rect {

@@ -95,8 +95,8 @@ func (m *Circle) getLatLng(plus bool) s2.LatLng {
 	}
 }
 
-func (m *Circle) ExtraMarginPixels() float64 {
-	return 0.5 * m.Weight
+func (m *Circle) ExtraMarginPixels() (float64, float64, float64, float64) {
+	return m.Weight, m.Weight, m.Weight, m.Weight
 }
 
 func (m *Circle) Bounds() s2.Rect {

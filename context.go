@@ -216,6 +216,16 @@ func (m *Context) OverrideAttribution(attribution string) {
 	m.overrideAttribution = &attribution
 }
 
+// Attribution returns the current attribution string - either the overridden
+// version (using OverrideAttribution) or the one set by the selected
+// TileProvider.
+func (m *Context) Attribution() string {
+	if m.overrideAttribution != nil {
+		return *m.overrideAttribution
+	}
+	return m.tileProvider.Attribution
+}
+
 func (m *Context) determineBounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, object := range m.objects {
@@ -224,14 +234,22 @@ func (m *Context) determineBounds() s2.Rect {
 	return r
 }
 
-func (m *Context) determineExtraMarginPixels() float64 {
-	p := 0.0
-	for _, object := range m.objects {
-		if pp := object.ExtraMarginPixels(); pp > p {
-			p = pp
-		}
+func (m *Context) determineExtraMarginPixels() (float64, float64, float64, float64) {
+	maxL := 0.0
+	maxT := 0.0
+	maxR := 0.0
+	maxB := 0.0
+	if m.Attribution() != "" {
+		maxB = 12.0
 	}
-	return p
+	for _, object := range m.objects {
+		l, t, r, b := object.ExtraMarginPixels()
+		maxL = math.Max(maxL, l)
+		maxT = math.Max(maxT, t)
+		maxR = math.Max(maxR, r)
+		maxB = math.Max(maxB, b)
+	}
+	return maxL, maxT, maxR, maxB
 }
 
 func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
@@ -241,9 +259,9 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	}
 
 	tileSize := m.tileProvider.TileSize
-	margin := 4.0 + m.determineExtraMarginPixels()
-	w := (float64(m.width) - 2.0*margin) / float64(tileSize)
-	h := (float64(m.height) - 2.0*margin) / float64(tileSize)
+	marginL, marginT, marginR, marginB := m.determineExtraMarginPixels()
+	w := (float64(m.width) - 2.0*math.Max(marginL, marginR)) / float64(tileSize)
+	h := (float64(m.height) - 2.0*math.Max(marginT, marginB)) / float64(tileSize)
 	minX := (b.Lo().Lng.Degrees() + 180.0) / 360.0
 	maxX := (b.Hi().Lng.Degrees() + 180.0) / 360.0
 	minY := (1.0 - math.Log(math.Tan(b.Lo().Lat.Radians())+(1.0/math.Cos(b.Lo().Lat.Radians())))/math.Pi) / 2.0
@@ -441,12 +459,8 @@ func (m *Context) Render() (image.Image, error) {
 		img, image.Point{trans.pCenterX - int(m.width)/2, trans.pCenterY - int(m.height)/2},
 		draw.Src)
 
-	attribution := m.tileProvider.Attribution
-	if m.overrideAttribution != nil {
-		attribution = *m.overrideAttribution
-	}
-
 	// draw attribution
+	attribution := m.Attribution()
 	if attribution == "" {
 		return croppedImg, nil
 	}

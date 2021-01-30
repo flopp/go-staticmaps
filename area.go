@@ -72,8 +72,8 @@ func ParseAreaString(s string) (*Area, error) {
 	return area, nil
 }
 
-func (p *Area) ExtraMarginPixels() float64 {
-	return 0.5 * p.Weight
+func (p *Area) ExtraMarginPixels() (float64, float64, float64, float64) {
+	return p.Weight, p.Weight, p.Weight, p.Weight
 }
 
 func (p *Area) Bounds() s2.Rect {
