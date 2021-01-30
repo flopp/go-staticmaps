@@ -95,10 +95,12 @@ func (m *Circle) getLatLng(plus bool) s2.LatLng {
 	}
 }
 
+// ExtraMarginPixels returns the left, top, right, bottom pixel margin of the Circle object, which is exactly the line width.
 func (m *Circle) ExtraMarginPixels() (float64, float64, float64, float64) {
 	return m.Weight, m.Weight, m.Weight, m.Weight
 }
 
+// Bounds returns the geographical boundary rect (excluding the actual pixel dimensions).
 func (m *Circle) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(m.getLatLng(false))
@@ -106,6 +108,7 @@ func (m *Circle) Bounds() s2.Rect {
 	return r
 }
 
+// Draw draws the object in the given graphical context.
 func (m *Circle) Draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Circle coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())

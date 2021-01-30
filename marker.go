@@ -54,8 +54,8 @@ func parseSizeString(s string) (float64, error) {
 		return 8.0, nil
 	}
 
-	if float_value, err := strconv.ParseFloat(s, 64); err == nil && float_value > 0 {
-		return float_value, nil
+	if floatValue, err := strconv.ParseFloat(s, 64); err == nil && floatValue > 0 {
+		return floatValue, nil
 	}
 
 	return 0.0, fmt.Errorf("cannot parse size string: '%s'", s)
@@ -124,6 +124,7 @@ func (m *Marker) Bounds() s2.Rect {
 	return r
 }
 
+// Draw draws the object in the given graphical context.
 func (m *Marker) Draw(gc *gg.Context, trans *Transformer) {
 	if !CanDisplay(m.Position) {
 		log.Printf("Marker coordinates not displayable: %f/%f", m.Position.Lat.Degrees(), m.Position.Lng.Degrees())

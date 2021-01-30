@@ -84,10 +84,12 @@ func ParsePathString(s string) ([]*Path, error) {
 	return paths, nil
 }
 
+// ExtraMarginPixels returns the left, top, right, bottom pixel margin of the Path object, which is exactly the line width.
 func (p *Path) ExtraMarginPixels() (float64, float64, float64, float64) {
 	return p.Weight, p.Weight, p.Weight, p.Weight
 }
 
+// Bounds returns the geographical boundary rect (excluding the actual pixel dimensions).
 func (p *Path) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	for _, ll := range p.Positions {
@@ -96,6 +98,7 @@ func (p *Path) Bounds() s2.Rect {
 	return r
 }
 
+// Draw draws the object in the given graphical context.
 func (p *Path) Draw(gc *gg.Context, trans *Transformer) {
 	if len(p.Positions) <= 1 {
 		return
