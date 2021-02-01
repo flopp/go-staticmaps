@@ -15,6 +15,7 @@ import (
 	"math"
 
 	"github.com/fogleman/gg"
+	"github.com/golang/geo/r2"
 	"github.com/golang/geo/s1"
 	"github.com/golang/geo/s2"
 )
@@ -299,22 +300,65 @@ func (m *Context) determineCenter(bounds s2.Rect) s2.LatLng {
 	return s2.LatLng{Lat: lat, Lng: lng}
 }
 
+// adjustCenter adjust the center such that the map objects are properly centerd in the view wrt. their pixel margins.
+func (m *Context) adjustCenter(center s2.LatLng, zoom int) s2.LatLng {
+	if m.objects == nil || len(m.objects) == 0 {
+		return center
+	}
+
+	transformer := newTransformer(m.width, m.height, zoom, center, m.tileProvider.TileSize)
+
+	first := true
+	minX := 0.0
+	maxX := 0.0
+	minY := 0.0
+	maxY := 0.0
+	for _, object := range m.objects {
+		bounds := object.Bounds()
+		nwX, nwY := transformer.LatLngToXY(bounds.Vertex(3))
+		seX, seY := transformer.LatLngToXY(bounds.Vertex(1))
+		l, t, r, b := object.ExtraMarginPixels()
+		if first {
+			minX = nwX - l
+			maxX = seX + r
+			minY = nwY - t
+			maxY = seY + b
+			first = false
+		} else {
+			minX = math.Min(minX, nwX-l)
+			maxX = math.Max(maxX, seX+r)
+			minY = math.Min(minY, nwY-t)
+			maxY = math.Max(maxY, seY+b)
+		}
+	}
+
+	centerX := (maxX + minX) * 0.5
+	centerY := (maxY + minY) * 0.5
+
+	return transformer.XYToLatLng(centerX, centerY)
+}
+
 func (m *Context) determineZoomCenter() (int, s2.LatLng, error) {
-	bounds := m.determineBounds()
 	if m.hasBoundingBox && !m.boundingBox.IsEmpty() {
 		center := m.determineCenter(m.boundingBox)
 		return m.determineZoom(m.boundingBox, center), center, nil
-	} else if m.hasCenter {
+	}
+
+	if m.hasCenter {
 		if m.hasZoom {
 			return m.zoom, m.center, nil
 		}
-		return m.determineZoom(bounds, m.center), m.center, nil
-	} else if !bounds.IsEmpty() {
+		return m.determineZoom(m.determineBounds(), m.center), m.center, nil
+	}
+
+	bounds := m.determineBounds()
+	if !bounds.IsEmpty() {
 		center := m.determineCenter(bounds)
-		if m.hasZoom {
-			return m.zoom, center, nil
+		zoom := m.zoom
+		if !m.hasZoom {
+			zoom = m.determineZoom(bounds, center)
 		}
-		return m.determineZoom(bounds, center), center, nil
+		return zoom, m.adjustCenter(center, zoom), nil
 	}
 
 	return 0, s2.LatLngFromDegrees(0, 0), errors.New("cannot determine map extent: no center coordinates given, no bounding box given, no content (markers, paths, areas) given")
@@ -404,6 +448,13 @@ func (t *Transformer) LatLngToXY(ll s2.LatLng) (float64, float64) {
 		}
 	}
 	return x, y
+}
+
+// XYToLatLng transforms image x, y coordinates to  a latitude longitude pair.
+func (t *Transformer) XYToLatLng(x float64, y float64) s2.LatLng {
+	xx := ((((x - float64(t.pCenterX)) / float64(t.tileSize)) + t.tCenterX) / t.numTiles) - 0.5
+	yy := 0.5 - (((y-float64(t.pCenterY))/float64(t.tileSize))+t.tCenterY)/t.numTiles
+	return t.proj.ToLatLng(r2.Point{X: xx, Y: yy})
 }
 
 // Rect returns an s2.Rect bounding box around the set of tiles described by Transformer.
