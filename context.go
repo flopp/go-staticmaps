@@ -261,8 +261,13 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 
 	tileSize := m.tileProvider.TileSize
 	marginL, marginT, marginR, marginB := m.determineExtraMarginPixels()
-	w := (float64(m.width) - 2.0*math.Max(marginL, marginR)) / float64(tileSize)
-	h := (float64(m.height) - 2.0*math.Max(marginT, marginB)) / float64(tileSize)
+	w := (float64(m.width) - marginL - marginR) / float64(tileSize)
+	h := (float64(m.height) - marginT - marginB) / float64(tileSize)
+	if w <= 0 || h <= 0 {
+		log.Printf("Object margins are bigger than the target image size => ignoring object margins for calculation of the zoom level")
+		w = float64(m.width) / float64(tileSize)
+		h = float64(m.height) / float64(tileSize)
+	}
 	minX := (b.Lo().Lng.Degrees() + 180.0) / 360.0
 	maxX := (b.Hi().Lng.Degrees() + 180.0) / 360.0
 	minY := (1.0 - math.Log(math.Tan(b.Lo().Lat.Radians())+(1.0/math.Cos(b.Lo().Lat.Radians())))/math.Pi) / 2.0
@@ -330,6 +335,11 @@ func (m *Context) adjustCenter(center s2.LatLng, zoom int) s2.LatLng {
 			minY = math.Min(minY, nwY-t)
 			maxY = math.Max(maxY, seY+b)
 		}
+	}
+
+	if (maxX-minX) > float64(m.width) || (maxY-minY) > float64(m.height) {
+		log.Printf("Object margins are bigger than the target image size => ignoring object margins for adjusting the center")
+		return center
 	}
 
 	centerX := (maxX + minX) * 0.5
@@ -605,6 +615,10 @@ func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *Transformer, tile
 			x = x + tiles
 		} else if x >= tiles {
 			x = x - tiles
+		}
+		if x < 0 || x >= tiles {
+			log.Printf("Skipping out of bounds tile column %d/?", x)
+			continue
 		}
 		for yy := 0; yy < trans.tCountY; yy++ {
 			y := trans.tOriginY + yy
