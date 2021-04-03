@@ -103,6 +103,19 @@ func handleMarkersOption(ctx *sm.Context, parameters []string) {
 	}
 }
 
+func handleImageMarkersOption(ctx *sm.Context, parameters []string) {
+	for _, s := range parameters {
+		markers, err := sm.ParseImageMarkerString(s)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			for _, marker := range markers {
+				ctx.AddObject(marker)
+			}
+		}
+	}
+}
+
 func handlePathsOption(ctx *sm.Context, parameters []string) {
 	for _, s := range parameters {
 		paths, err := sm.ParsePathString(s)
@@ -153,6 +166,7 @@ func main() {
 		Background string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
 		UserAgent  string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" value-name:"USERAGENT"`
 		Markers    []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
+		ImageMarkers    []string `short:"i" long:"imagemarker" description:"Add an image marker to the static map" value-name:"MARKER"`
 		Paths      []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
 		Areas      []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
 		Circles    []string `short:"C" long:"circle" description:"Add a circle to the static map" value-name:"CIRCLE"`
@@ -200,6 +214,7 @@ func main() {
 
 	handleAreasOption(ctx, opts.Areas)
 	handleMarkersOption(ctx, opts.Markers)
+	handleImageMarkersOption(ctx, opts.ImageMarkers)
 	handleCirclesOption(ctx, opts.Circles)
 	handlePathsOption(ctx, opts.Paths)
 

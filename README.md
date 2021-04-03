@@ -81,26 +81,23 @@ See [PkgGoDev](https://pkg.go.dev/badge/github.com/flopp/go-staticmaps) for a co
     Creates a static map
 
     Application Options:
-          --width=PIXELS       Width of the generated static map image (default: 512)
-          --height=PIXELS      Height of the generated static map image (default: 512)
-      -o, --output=FILENAME    Output file name (default: map.png)
-      -t, --type=MAPTYPE       Select the map type; list possible map types with '--type list'
-      -c, --center=LATLNG      Center coordinates (lat,lng) of the static map
-      -z, --zoom=ZOOMLEVEL     Zoom factor
-      -b, --bbox=NW_LATLNG|SE_LATLNG
-                               Set the bounding box (NW_LATLNG = north-western point of the
-                               bounding box, SW_LATLNG = southe-western point of the bounding
-                               box)
-      --background=COLOR       Background color (default: transparent)
-      -u, --useragent=USERAGENT
-                               Overwrite the default HTTP user agent string
-      -m, --marker=MARKER      Add a marker to the static map
-      -p, --path=PATH          Add a path to the static map
-      -a, --area=AREA          Add an area to the static map
-      -C, --circle=CIRCLE      Add a circle to the static map
+          --width=PIXELS              Width of the generated static map image (default: 512)
+          --height=PIXELS             Height of the generated static map image (default: 512)
+      -o, --output=FILENAME           Output file name (default: map.png)
+      -t, --type=MAPTYPE              Select the map type; list possible map types with '--type list'
+      -c, --center=LATLNG             Center coordinates (lat,lng) of the static map
+      -z, --zoom=ZOOMLEVEL            Zoom factor
+      -b, --bbox=nwLATLNG|seLATLNG    Bounding box of the static map
+          --background=COLOR          Background color (default: transparent)
+      -u, --useragent=USERAGENT       Overwrite the default HTTP user agent string
+      -m, --marker=MARKER             Add a marker to the static map
+      -i, --imagemarker=MARKER        Add an image marker to the static map
+      -p, --path=PATH                 Add a path to the static map
+      -a, --area=AREA                 Add an area to the static map
+      -C, --circle=CIRCLE             Add a circle to the static map
 
     Help Options:
-      -h, --help               Show this help message
+      -h, --help                      Show this help message
 
 ### General
 The command line interface tries to resemble [Google's Static Maps API](https://developers.google.com/maps/documentation/static-maps/intro).
@@ -122,6 +119,13 @@ The `--marker` option defines one or more map markers of the same style. Use mul
 - `label:LABEL` - where `LABEL` is an alpha numeric character, i.e. `A`-`Z`, `a`-`z`, `0`-`9`; (default: no label)
 - `labelcolor:COLOR` - where `COLOR` is either of the form `0xRRGGBB`, `0xRRGGBBAA`, or one of `black`, `blue`, `brown`, `green`, `orange`, `purple`, `red`, `yellow`, `white` (default: `black` or `white`, depending on the marker color)
 
+Using the `--imagemarker` option, you can use custom images as markers:
+
+    --imagemarker image:IMAGEFILE|offsetx:OFFSETX|offsety:OFFSETY|LATLNG|LATLNG|...
+
+`IMAGEFILE` is the file name of a PNG or JPEG file,
+
+`OFFSETX` and `OFFSETY` are the pixel offsets of the reference point from the top-left corner of the image.
 
 ### Paths
 The `--path` option defines a path on the map. Use multiple `--path` options to add multiple paths to the map.
