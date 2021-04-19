@@ -161,6 +161,7 @@ func GetTileProviders() map[string]*TileProvider {
 		NewTileProviderCartoLight(),
 		NewTileProviderCartoDark(),
 		NewTileProviderArcgisWorldImagery(),
+		NewTileProviderWikimedia(),
 	}
 
 	for _, tp := range list {
