@@ -29,14 +29,16 @@ type TileFetcher struct {
 	tileProvider *TileProvider
 	cache        TileCache
 	userAgent    string
+	online       bool
 }
 
 // NewTileFetcher creates a new Tilefetcher struct
-func NewTileFetcher(tileProvider *TileProvider, cache TileCache) *TileFetcher {
+func NewTileFetcher(tileProvider *TileProvider, cache TileCache, online bool) *TileFetcher {
 	t := new(TileFetcher)
 	t.tileProvider = tileProvider
 	t.cache = cache
 	t.userAgent = "Mozilla/5.0+(compatible; go-staticmaps/0.1; https://github.com/flopp/go-staticmaps)"
+	t.online = online
 	return t
 }
 
@@ -72,6 +74,10 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 		if err == nil {
 			return cachedImg, nil
 		}
+	}
+
+	if !t.online {
+		return nil, errTileNotFound
 	}
 
 	url := t.url(zoom, x, y)
