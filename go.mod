@@ -1,4 +1,4 @@
-module github.com/flopp/go-staticmaps
+module github.com/HomesNZ/go-staticmaps
 
 go 1.12
 
