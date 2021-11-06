@@ -21,11 +21,13 @@ import (
 // Marker represents a marker on the map
 type Marker struct {
 	MapObject
-	Position   s2.LatLng
-	Color      color.Color
-	Size       float64
-	Label      string
-	LabelColor color.Color
+	Position     s2.LatLng
+	Color        color.Color
+	Size         float64
+	Label        string
+	LabelColor   color.Color
+	LabelXOffset float64
+	LabelYOffset float64
 }
 
 // NewMarker creates a new Marker
@@ -40,6 +42,8 @@ func NewMarker(pos s2.LatLng, col color.Color, size float64) *Marker {
 	} else {
 		m.LabelColor = color.RGBA{0xff, 0xff, 0xff, 0xff}
 	}
+	m.LabelXOffset = 0.5
+	m.LabelYOffset = 0.5
 
 	return m
 }
@@ -61,6 +65,17 @@ func parseSizeString(s string) (float64, error) {
 	return 0.0, fmt.Errorf("cannot parse size string: '%s'", s)
 }
 
+func ParseLabelOffset(s string) (float64, error) {
+
+	// todo: add a way to specify offset with up, down, right, left
+
+	if floatValue, err := strconv.ParseFloat(s, 64); err == nil && floatValue > 0 {
+		return floatValue, nil
+	}
+
+	return 0.5, fmt.Errorf("cannot parse label offset: '%s'", s)
+}
+
 // ParseMarkerString parses a string and returns an array of markers
 func ParseMarkerString(s string) ([]*Marker, error) {
 	markers := make([]*Marker, 0)
@@ -68,6 +83,8 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 	var markerColor color.Color = color.RGBA{0xff, 0, 0, 0xff}
 	size := 16.0
 	label := ""
+	labelXOffset := 0.5
+	labelYOffset := 0.5
 	var labelColor color.Color
 
 	for _, ss := range strings.Split(s, "|") {
@@ -91,6 +108,18 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			if err != nil {
 				return nil, err
 			}
+		} else if ok, suffix := hasPrefix(ss, "labelxoffset:"); ok {
+			var err error
+			labelXOffset, err = ParseLabelOffset(suffix)
+			if err != nil {
+				return nil, err
+			}
+		} else if ok, suffix := hasPrefix(ss, "labelyoffset:"); ok {
+			var err error
+			labelYOffset, err = ParseLabelOffset(suffix)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			lat, lng, err := coordsparser.Parse(ss)
 			if err != nil {
@@ -101,6 +130,8 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			if labelColor != nil {
 				m.SetLabelColor(labelColor)
 			}
+			m.LabelXOffset = labelXOffset
+			m.LabelYOffset = labelYOffset
 			markers = append(markers, m)
 		}
 	}
@@ -147,6 +178,6 @@ func (m *Marker) Draw(gc *gg.Context, trans *Transformer) {
 
 	if m.Label != "" {
 		gc.SetColor(m.LabelColor)
-		gc.DrawStringAnchored(m.Label, x, y-m.Size, 0.5, 0.5)
+		gc.DrawStringAnchored(m.Label, x, y-m.Size, m.LabelXOffset, m.LabelYOffset)
 	}
 }
