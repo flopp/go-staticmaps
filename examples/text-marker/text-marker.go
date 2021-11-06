@@ -6,9 +6,9 @@ import (
 	"image/color"
 	"math"
 
-	sm "github.com/flopp/go-staticmaps"
 	"github.com/fogleman/gg"
 	"github.com/golang/geo/s2"
+	sm "github.com/shanghuiyang/go-staticmaps"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 )

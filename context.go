@@ -40,6 +40,7 @@ type Context struct {
 	overlays []*TileProvider
 
 	userAgent    string
+	online       bool
 	tileProvider *TileProvider
 	cache        TileCache
 
@@ -56,6 +57,7 @@ func NewContext() *Context {
 	t.hasBoundingBox = false
 	t.background = nil
 	t.userAgent = ""
+	t.online = true
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	t.cache = NewTileCacheFromUserCache(0777)
 	return t
@@ -69,6 +71,12 @@ func (m *Context) SetTileProvider(t *TileProvider) {
 // SetCache takes a nil argument to disable caching
 func (m *Context) SetCache(cache TileCache) {
 	m.cache = cache
+}
+
+// SetOnline enables/disables online
+// TileFetcher will only fetch tiles from cache if online = false
+func (m *Context) SetOnline(online bool) {
+	m.online = online
 }
 
 // SetUserAgent sets the HTTP user agent string used when downloading map tiles
@@ -603,7 +611,7 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 }
 
 func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *Transformer, tileSize int, provider *TileProvider) error {
-	t := NewTileFetcher(provider, m.cache)
+	t := NewTileFetcher(provider, m.cache, m.online)
 	if m.userAgent != "" {
 		t.SetUserAgent(m.userAgent)
 	}
