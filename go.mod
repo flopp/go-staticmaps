@@ -1,4 +1,4 @@
-module github.com/shanghuiyang/go-staticmaps
+module github.com/flopp/go-staticmaps
 
 go 1.15
 
