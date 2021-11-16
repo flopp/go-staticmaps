@@ -148,8 +148,6 @@ func GetTileProviders() map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
 
 	list := []*TileProvider{
-		NewTileProviderOpenStreetMaps(),
-		NewTileProviderOpenCycleMap(),
 		NewTileProviderThunderforestLandscape(),
 		NewTileProviderThunderforestOutdoors(),
 		NewTileProviderThunderforestTransport(),
