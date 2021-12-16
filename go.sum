@@ -1,5 +1,3 @@
-github.com/Wessie/appdirs v0.0.0-20141031215813-6573e894f8e2 h1:fqg13ru+I2eUOcsjpZkPITUSdbLUgTdRVnSy/BVTiig=
-github.com/Wessie/appdirs v0.0.0-20141031215813-6573e894f8e2/go.mod h1:MxPYge+YNbiBwX/6rN+6zOX1fWQAfKj/RxwJpSImex4=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/flopp/go-coordsparser v0.0.0-20201115094714-8baaeb7062d5 h1:o5yuyiGtJ4c9ECOq12K6EqsQNnsGF6I+WqBZynB2Hlw=
