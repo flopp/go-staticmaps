@@ -3,7 +3,6 @@ module github.com/flopp/go-staticmaps
 go 1.15
 
 require (
-	github.com/Wessie/appdirs v0.0.0-20141031215813-6573e894f8e2
 	github.com/flopp/go-coordsparser v0.0.0-20201115094714-8baaeb7062d5
 	github.com/fogleman/gg v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect

@@ -2,8 +2,6 @@ package sm
 
 import (
 	"os"
-
-	"github.com/Wessie/appdirs"
 )
 
 // TileCache provides cache information to the tile fetcher
@@ -40,9 +38,12 @@ func NewTileCache(rootPath string, perm os.FileMode) *TileCacheStaticPath {
 
 // NewTileCacheFromUserCache stores cache files in a user-specific cache directory.
 func NewTileCacheFromUserCache(perm os.FileMode) *TileCacheStaticPath {
-	app := appdirs.New("go-staticmaps", "flopp.net", "0.1")
+	path, err := os.UserCacheDir()
+	if err != nil {
+		path += "/go-staticmaps"
+	}
 	return &TileCacheStaticPath{
-		path: app.UserCache(),
+		path: path,
 		perm: perm,
 	}
 }
