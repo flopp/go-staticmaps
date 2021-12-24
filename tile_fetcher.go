@@ -32,6 +32,12 @@ type TileFetcher struct {
 	online       bool
 }
 
+// Tile defines a single map tile
+type Tile struct {
+	Img        image.Image
+	X, Y, Zoom int
+}
+
 // NewTileFetcher creates a new Tilefetcher struct
 func NewTileFetcher(tileProvider *TileProvider, cache TileCache, online bool) *TileFetcher {
 	t := new(TileFetcher)
@@ -67,38 +73,40 @@ func cacheFileName(cache TileCache, providerName string, zoom, x, y int) string 
 }
 
 // Fetch download (or retrieves from the cache) a tile image for the specified zoom level and tile coordinates
-func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
+func (t *TileFetcher) Fetch(tile *Tile) error {
 	if t.cache != nil {
-		fileName := cacheFileName(t.cache, t.tileProvider.Name, zoom, x, y)
+		fileName := cacheFileName(t.cache, t.tileProvider.Name, tile.Zoom, tile.X, tile.Y)
 		cachedImg, err := t.loadCache(fileName)
 		if err == nil {
-			return cachedImg, nil
+			tile.Img = cachedImg
+			return nil
 		}
 	}
 
 	if !t.online {
-		return nil, errTileNotFound
+		return errTileNotFound
 	}
 
-	url := t.url(zoom, x, y)
+	url := t.url(tile.Zoom, tile.X, tile.Y)
 	data, err := t.download(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	img, _, err := image.Decode(bytes.NewBuffer(data))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if t.cache != nil {
-		fileName := cacheFileName(t.cache, t.tileProvider.Name, zoom, x, y)
+		fileName := cacheFileName(t.cache, t.tileProvider.Name, tile.Zoom, tile.X, tile.Y)
 		if err := t.storeCache(fileName, data); err != nil {
 			log.Printf("Failed to store map tile as '%s': %s", fileName, err)
 		}
 	}
 
-	return img, nil
+	tile.Img = img
+	return nil
 }
 
 func (t *TileFetcher) download(url string) ([]byte, error) {
