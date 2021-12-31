@@ -1,6 +1,6 @@
 module github.com/flopp/go-staticmaps
 
-go 1.15
+go 1.16
 
 require (
 	github.com/flopp/go-coordsparser v0.0.0-20201115094714-8baaeb7062d5

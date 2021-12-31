@@ -4,80 +4,47 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.16.x, 1.17.x]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
       - run: go mod download
       - run: go build -v .
-  vet:
-    name: vet
+  tests:
+    name: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
       - run: go mod download
-      - run: go vet ./...
-  shadow:
-    name: shadow
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
       - run: go get -v golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
-      - run: go mod download
-      - run: go vet -vettool=$HOME/go/bin/shadow ./...
-  imports:
-    name: imports
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
       - run: go get -v golang.org/x/tools/cmd/goimports
-      - run: d="$($HOME/go/bin/goimports -d ./)" && if [ -n "$d" ]; then echo "goimports generated output:" ; echo "$d"; exit 1; fi
-  staticcheck:
-    name: staticheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-      - run: go install honnef.co/go/tools/cmd/staticcheck
-      - run: $HOME/go/bin/staticcheck ./...
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
+      - run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - run: go get -v golang.org/x/lint/golint
-      - run: set +e ; d="$($HOME/go/bin/golint -min_confidence 1 ./... | grep -v comment)" ; if [ -z "$d" ]; then exit 0 ; else echo "golint check output:" ; echo "$d" ; exit 1 ; fi ; set -e
-  exportloopref:
-    name: exportloopref
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
       - run: go get -v github.com/kyoh86/exportloopref/cmd/exportloopref
-      - run: $HOME/go/bin/exportloopref ./...
-  exhaustive:
-    name: exhaustive
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
       - run: go get -v github.com/nishanths/exhaustive/...
-      - run: $HOME/go/bin/exhaustive -default-signifies-exhaustive ./...
-  cyclo:
-    name: cyclo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
       - run: go get -v github.com/fzipp/gocyclo/cmd/gocyclo
-      - run: $HOME/go/bin/gocyclo -over 19 $(find . -iname '*.go' -type f)
-  fmt:
-    name: fmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-      - uses: actions/checkout@v2
-      - run: test -z $(gofmt -s -l $(find . -iname '*.go' -type f))
+      - name: vet 
+        run: go vet ./...
+      - name: shadow 
+        run: go vet -vettool=$HOME/go/bin/shadow ./...
+      - name: imports
+        run: d="$($HOME/go/bin/goimports -d ./)" && if [ -n "$d" ]; then echo "goimports generated output:" ; echo "$d"; exit 1; fi
+      - name: staticheck
+        run: $HOME/go/bin/staticcheck ./...
+      - name: lint
+        run: set +e ; d="$($HOME/go/bin/golint -min_confidence 1 ./... | grep -v comment)" ; if [ -z "$d" ]; then exit 0 ; else echo "golint check output:" ; echo "$d" ; exit 1 ; fi ; set -e
+      - name: exportloopref
+        run: $HOME/go/bin/exportloopref ./...
+      - name: exhaustive
+        run: $HOME/go/bin/exhaustive -default-signifies-exhaustive ./...
+      - name: cyclo
+        run: $HOME/go/bin/gocyclo -over 19 $(find . -iname '*.go' -type f)
+      - name: fmt
+        run: test -z $(gofmt -s -l $(find . -iname '*.go' -type f))
