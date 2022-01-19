@@ -42,7 +42,7 @@ package main
 import (
   "image/color"
 
-  "github.com/flopp/go-staticmaps"
+  sm "github.com/flopp/go-staticmaps"
   "github.com/fogleman/gg"
   "github.com/golang/geo/s2"
 )
