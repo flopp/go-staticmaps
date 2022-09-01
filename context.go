@@ -28,6 +28,7 @@ type Context struct {
 
 	hasZoom bool
 	zoom    int
+	maxZoom int
 
 	hasCenter bool
 	center    s2.LatLng
@@ -54,6 +55,7 @@ func NewContext() *Context {
 	t.width = 512
 	t.height = 512
 	t.hasZoom = false
+	t.maxZoom = 30
 	t.hasCenter = false
 	t.hasBoundingBox = false
 	t.background = nil
@@ -95,6 +97,11 @@ func (m *Context) SetSize(width, height int) {
 func (m *Context) SetZoom(zoom int) {
 	m.zoom = zoom
 	m.hasZoom = true
+}
+
+// SetMaxZoom sets the upper zoom level limit when using dynamic zoom
+func (m *Context) SetMaxZoom(n int) {
+	m.maxZoom = n
 }
 
 // SetCenter sets the center coordinates
@@ -292,7 +299,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	dy := math.Abs(maxY - minY)
 
 	zoom := 1
-	for zoom < 30 {
+	for zoom < m.maxZoom {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
 			return zoom - 1
@@ -300,7 +307,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 		zoom = zoom + 1
 	}
 
-	return 15
+	return m.maxZoom
 }
 
 // determineCenter computes a point that is visually centered in Mercator projection
