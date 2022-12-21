@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: homes-go-staticmaps
+  description: A go (golang) library and command line tool to render static map images using OpenStreetMap tiles
+  # annotations:
+    # gitlab.com/project-id: "11111111"
+    # gcp/project-id: tm-core-prod-XXXX
+    #pagerduty.com/integration-key:
+spec:
+  owner: homies
+  type: library
+  lifecycle: production
+  #system:
