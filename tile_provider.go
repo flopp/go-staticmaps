@@ -27,8 +27,8 @@ func NewTileProviderOpenStreetMaps() *TileProvider {
 	t.Name = "osm"
 	t.Attribution = "Maps and Data (c) openstreetmap.org and contributors, ODbL"
 	t.TileSize = 256
-	t.URLPattern = "http://%[1]s.tile.openstreetmap.org/%[2]d/%[3]d/%[4]d.png"
-	t.Shards = []string{"a", "b", "c"}
+	t.URLPattern = "https://tile.openstreetmap.org/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{}
 	return t
 }
 
