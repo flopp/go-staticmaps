@@ -27,16 +27,19 @@ func NewStar(pos s2.LatLng, size float64) *Star {
 	return s
 }
 
+// ExtraMarginPixels returns the left, top, right, bottom pixel margin of the Star object.
 func (s *Star) ExtraMarginPixels() (float64, float64, float64, float64) {
 	return s.Size * 0.5, s.Size * 0.5, s.Size * 0.5, s.Size * 0.5
 }
 
+// Bounds returns the bounding rectangle of the Star object, which just contains the center point.
 func (s *Star) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(s.Position)
 	return r
 }
 
+// Draw draws the object.
 func (s *Star) Draw(gc *gg.Context, trans *sm.Transformer) {
 	if !sm.CanDisplay(s.Position) {
 		return

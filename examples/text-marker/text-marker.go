@@ -13,7 +13,12 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
-// TextMarker
+// TextMarker is an MapObject that displays a text and has a pointy tip:
+//
+//	+------------+
+//	| text label |
+//	+----\  /----+
+//	      \/
 type TextMarker struct {
 	sm.MapObject
 	Position   s2.LatLng
@@ -38,18 +43,21 @@ func NewTextMarker(pos s2.LatLng, text string) *TextMarker {
 	return s
 }
 
+// ExtraMarginPixels returns the left, top, right, bottom pixel margin of the TextMarker object.
 func (s *TextMarker) ExtraMarginPixels() (float64, float64, float64, float64) {
 	w := math.Max(4.0+s.TextWidth, 2*s.TipSize)
 	h := s.TipSize + s.TextHeight + 4.0
 	return w * 0.5, h, w * 0.5, 0.0
 }
 
+// Bounds returns the bounding rectangle of the TextMarker object, which is just the tip position.
 func (s *TextMarker) Bounds() s2.Rect {
 	r := s2.EmptyRect()
 	r = r.AddPoint(s.Position)
 	return r
 }
 
+// Draw draws the object.
 func (s *TextMarker) Draw(gc *gg.Context, trans *sm.Transformer) {
 	if !sm.CanDisplay(s.Position) {
 		return

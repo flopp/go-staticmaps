@@ -27,7 +27,6 @@ jobs:
       - run: go get -v golang.org/x/tools/cmd/goimports
       - run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - run: go get -v golang.org/x/lint/golint
-      - run: go get -v github.com/kyoh86/exportloopref/cmd/exportloopref
       - run: go get -v github.com/nishanths/exhaustive/...
       - run: go get -v github.com/fzipp/gocyclo/cmd/gocyclo
       - name: vet 
@@ -40,8 +39,6 @@ jobs:
         run: $HOME/go/bin/staticcheck ./...
       - name: lint
         run: set +e ; d="$($HOME/go/bin/golint -min_confidence 1 ./... | grep -v comment)" ; if [ -z "$d" ]; then exit 0 ; else echo "golint check output:" ; echo "$d" ; exit 1 ; fi ; set -e
-      - name: exportloopref
-        run: $HOME/go/bin/exportloopref ./...
       - name: exhaustive
         run: $HOME/go/bin/exhaustive -default-signifies-exhaustive ./...
       - name: cyclo

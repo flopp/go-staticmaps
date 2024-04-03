@@ -65,7 +65,7 @@ func parseSizeString(s string) (float64, error) {
 	return 0.0, fmt.Errorf("cannot parse size string: '%s'", s)
 }
 
-func ParseLabelOffset(s string) (float64, error) {
+func parseLabelOffset(s string) (float64, error) {
 
 	// todo: add a way to specify offset with up, down, right, left
 
@@ -110,13 +110,13 @@ func ParseMarkerString(s string) ([]*Marker, error) {
 			}
 		} else if ok, suffix := hasPrefix(ss, "labelxoffset:"); ok {
 			var err error
-			labelXOffset, err = ParseLabelOffset(suffix)
+			labelXOffset, err = parseLabelOffset(suffix)
 			if err != nil {
 				return nil, err
 			}
 		} else if ok, suffix := hasPrefix(ss, "labelyoffset:"); ok {
 			var err error
-			labelYOffset, err = ParseLabelOffset(suffix)
+			labelYOffset, err = parseLabelOffset(suffix)
 			if err != nil {
 				return nil, err
 			}
