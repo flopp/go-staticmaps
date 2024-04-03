@@ -13,7 +13,6 @@ import (
 	_ "image/jpeg" // to be able to decode jpegs
 	_ "image/png"  // to be able to decode pngs
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -131,7 +130,7 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	contents, err := ioutil.ReadAll(resp.Body)
+	contents, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
