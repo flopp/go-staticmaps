@@ -9,5 +9,5 @@ require (
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/tkrajina/gpxgo v1.1.2
-	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
+	golang.org/x/image v0.10.0
 )
