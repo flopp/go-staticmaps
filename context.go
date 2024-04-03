@@ -13,6 +13,7 @@ import (
 	"image/draw"
 	"log"
 	"math"
+	"strings"
 	"sync"
 
 	"github.com/fogleman/gg"
@@ -227,7 +228,8 @@ func (m *Context) ClearOverlays() {
 
 // OverrideAttribution sets a custom attribution string (or none if empty)
 //
-// Pay attention you might be violating the terms of usage for the
+// If the attribution string contains newline characters ("\n") it will printed across multiple lines.
+// Pay attention: you might be violating the terms of usage for the
 // selected map provider - only use the function if you are aware of this!
 func (m *Context) OverrideAttribution(attribution string) {
 	m.overrideAttribution = &attribution
@@ -541,14 +543,27 @@ func (m *Context) Render() (image.Image, error) {
 	if attribution == "" {
 		return croppedImg, nil
 	}
-	_, textHeight := gc.MeasureString(attribution)
-	boxHeight := textHeight + 4.0
+	lines := strings.Split(attribution, "\n")
+	lineHeight := 0.0
+	for _, line := range lines {
+		_, h := gc.MeasureString(line)
+		if h > float64(lineHeight) {
+			lineHeight = h
+		}
+	}
+	margin := 2.0
+	spacing := 2.0
+	boxHeight := lineHeight*float64(len(lines)) + 2*margin + spacing*float64(len(lines)-1)
 	gc = gg.NewContextForRGBA(croppedImg)
 	gc.SetRGBA(0.0, 0.0, 0.0, 0.5)
 	gc.DrawRectangle(0.0, float64(m.height)-boxHeight, float64(m.width), boxHeight)
 	gc.Fill()
 	gc.SetRGBA(1.0, 1.0, 1.0, 0.75)
-	gc.DrawString(attribution, 4.0, float64(m.height)-4.0)
+	y := float64(m.height) - boxHeight
+	for _, line := range lines {
+		gc.DrawStringAnchored(line, margin, y, 0, 1)
+		y += spacing + lineHeight
+	}
 
 	return croppedImg, nil
 }

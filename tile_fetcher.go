@@ -58,7 +58,7 @@ func (t *TileFetcher) url(zoom, x, y int) string {
 	if len(t.tileProvider.Shards) > 0 {
 		shard = t.tileProvider.Shards[(x+y)%ss]
 	}
-	return t.tileProvider.getURL(shard, zoom, x, y)
+	return t.tileProvider.getURL(shard, zoom, x, y, t.tileProvider.APIKey)
 }
 
 func cacheFileName(cache TileCache, providerName string, zoom, x, y int) string {

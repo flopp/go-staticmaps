@@ -19,8 +19,8 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-func handleTypeOption(ctx *sm.Context, parameter string) {
-	tileProviders := sm.GetTileProviders()
+func handleTypeOption(ctx *sm.Context, parameter string, thunderforestAPIKey string) {
+	tileProviders := sm.GetTileProviders(thunderforestAPIKey)
 	tp := tileProviders[parameter]
 	if tp != nil {
 		ctx.SetTileProvider(tp)
@@ -156,20 +156,21 @@ func handleCirclesOption(ctx *sm.Context, parameters []string) {
 func main() {
 	var opts struct {
 		//		ClearCache bool     `long:"clear-cache" description:"Clears the tile cache"`
-		Width        int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
-		Height       int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
-		Output       string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
-		Type         string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
-		Center       string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
-		Zoom         int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
-		BBox         string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
-		Background   string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
-		UserAgent    string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" value-name:"USERAGENT"`
-		Markers      []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
-		ImageMarkers []string `short:"i" long:"imagemarker" description:"Add an image marker to the static map" value-name:"MARKER"`
-		Paths        []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
-		Areas        []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
-		Circles      []string `short:"C" long:"circle" description:"Add a circle to the static map" value-name:"CIRCLE"`
+		Width              int      `long:"width" description:"Width of the generated static map image" value-name:"PIXELS" default:"512"`
+		Height             int      `long:"height" description:"Height of the generated static map image" value-name:"PIXELS" default:"512"`
+		Output             string   `short:"o" long:"output" description:"Output file name" value-name:"FILENAME" default:"map.png"`
+		Type               string   `short:"t" long:"type" description:"Select the map type; list possible map types with '--type list'" value-name:"MAPTYPE"`
+		Center             string   `short:"c" long:"center" description:"Center coordinates (lat,lng) of the static map" value-name:"LATLNG"`
+		Zoom               int      `short:"z" long:"zoom" description:"Zoom factor" value-name:"ZOOMLEVEL"`
+		BBox               string   `short:"b" long:"bbox" description:"Bounding box of the static map" value-name:"nwLATLNG|seLATLNG"`
+		Background         string   `long:"background" description:"Background color" value-name:"COLOR" default:"transparent"`
+		UserAgent          string   `short:"u" long:"useragent" description:"Overwrite the default HTTP user agent string" value-name:"USERAGENT"`
+		Markers            []string `short:"m" long:"marker" description:"Add a marker to the static map" value-name:"MARKER"`
+		ImageMarkers       []string `short:"i" long:"imagemarker" description:"Add an image marker to the static map" value-name:"MARKER"`
+		Paths              []string `short:"p" long:"path" description:"Add a path to the static map" value-name:"PATH"`
+		Areas              []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
+		Circles            []string `short:"C" long:"circle" description:"Add a circle to the static map" value-name:"CIRCLE"`
+		ThunderforstAPIKey string   `long:"thunderforestapikey" description:"API key to use with Thunderforst tile servers" value-name:"APIKEY" default:"NONE"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -187,7 +188,7 @@ func main() {
 	ctx := sm.NewContext()
 
 	if parser.FindOptionByLongName("type").IsSet() {
-		handleTypeOption(ctx, opts.Type)
+		handleTypeOption(ctx, opts.Type, opts.ThunderforstAPIKey)
 	}
 
 	ctx.SetSize(opts.Width, opts.Height)

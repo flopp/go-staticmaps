@@ -13,12 +13,13 @@ type TileProvider struct {
 	Attribution    string
 	IgnoreNotFound bool
 	TileSize       int
-	URLPattern     string // "%[1]s" => shard, "%[2]d" => zoom, "%[3]d" => x, "%[4]d" => y
+	URLPattern     string // "%[1]s" => shard, "%[2]d" => zoom, "%[3]d" => x, "%[4]d" => y, "%[5]s" => API key
 	Shards         []string
+	APIKey         string
 }
 
-func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
-	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
+func (t *TileProvider) getURL(shard string, zoom, x, y int, apikey string) string {
+	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y, apikey)
 }
 
 // NewTileProviderOpenStreetMaps creates a TileProvider struct for OSM's tile service
@@ -27,34 +28,35 @@ func NewTileProviderOpenStreetMaps() *TileProvider {
 	t.Name = "osm"
 	t.Attribution = "Maps and Data (c) openstreetmap.org and contributors, ODbL"
 	t.TileSize = 256
-	t.URLPattern = "https://tile.openstreetmap.org/%[2]d/%[3]d/%[4]d.png"
-	t.Shards = []string{}
+	t.URLPattern = "https://%[1]s.tile.openstreetmap.org/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{"a", "b", "c"}
 	return t
 }
 
-func newTileProviderThunderforest(name string) *TileProvider {
+func newTileProviderThunderforest(name string, apikey string) *TileProvider {
 	t := new(TileProvider)
 	t.Name = fmt.Sprintf("thunderforest-%s", name)
 	t.Attribution = "Maps (c) Thundeforest; Data (c) OSM and contributors, ODbL"
 	t.TileSize = 256
-	t.URLPattern = "https://%[1]s.tile.thunderforest.com/" + name + "/%[2]d/%[3]d/%[4]d.png"
+	t.APIKey = apikey
+	t.URLPattern = "https://%[1]s.tile.thunderforest.com/" + name + "/%[2]d/%[3]d/%[4]d.png?apikey=%[5]s"
 	t.Shards = []string{"a", "b", "c"}
 	return t
 }
 
 // NewTileProviderThunderforestLandscape creates a TileProvider struct for thundeforests's 'landscape' tile service
-func NewTileProviderThunderforestLandscape() *TileProvider {
-	return newTileProviderThunderforest("landscape")
+func NewTileProviderThunderforestLandscape(thunderforestApiKey string) *TileProvider {
+	return newTileProviderThunderforest("landscape", thunderforestApiKey)
 }
 
 // NewTileProviderThunderforestOutdoors creates a TileProvider struct for thundeforests's 'outdoors' tile service
-func NewTileProviderThunderforestOutdoors() *TileProvider {
-	return newTileProviderThunderforest("outdoors")
+func NewTileProviderThunderforestOutdoors(thunderforestApiKey string) *TileProvider {
+	return newTileProviderThunderforest("outdoors", thunderforestApiKey)
 }
 
 // NewTileProviderThunderforestTransport creates a TileProvider struct for thundeforests's 'transport' tile service
-func NewTileProviderThunderforestTransport() *TileProvider {
-	return newTileProviderThunderforest("transport")
+func NewTileProviderThunderforestTransport(thunderforestApiKey string) *TileProvider {
+	return newTileProviderThunderforest("transport", thunderforestApiKey)
 }
 
 // NewTileProviderStamenToner creates a TileProvider struct for stamens' 'toner' tile service
@@ -144,13 +146,13 @@ func NewTileProviderArcgisWorldImagery() *TileProvider {
 }
 
 // GetTileProviders returns a map of all available TileProviders
-func GetTileProviders() map[string]*TileProvider {
+func GetTileProviders(thunderforestApiKey string) map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
 
 	list := []*TileProvider{
-		NewTileProviderThunderforestLandscape(),
-		NewTileProviderThunderforestOutdoors(),
-		NewTileProviderThunderforestTransport(),
+		NewTileProviderThunderforestLandscape(thunderforestApiKey),
+		NewTileProviderThunderforestOutdoors(thunderforestApiKey),
+		NewTileProviderThunderforestTransport(thunderforestApiKey),
 		NewTileProviderStamenToner(),
 		NewTileProviderStamenTerrain(),
 		NewTileProviderOpenTopoMap(),
