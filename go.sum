@@ -20,6 +20,8 @@ github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5Cc
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tkrajina/gpxgo v1.3.1 h1:b9x0OgF0YqEtLKQoWC6SeCKy4OWUWSt9uzCDPKTI2LY=
 github.com/tkrajina/gpxgo v1.3.1/go.mod h1:795sjVRFo5wWyN6oOZp0RYienGGBJjpAlgOz2nCngA0=
+github.com/tkrajina/gpxgo v1.4.0 h1:cSD5uSwy3VZuNFieTEZLyRnuIwhonQEkGPkPGW4XNag=
+github.com/tkrajina/gpxgo v1.4.0/go.mod h1:BXSMfUAvKiEhMEXAFM2NvNsbjsSvp394mOvdcNjettg=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/image v0.15.0 h1:kOELfmgrmJlw4Cdb7g/QGuB3CvDrXbqEIww/pNtNBm8=
 golang.org/x/image v0.15.0/go.mod h1:HUYqC05R2ZcZ3ejNQsIHQDQiwWM4JBqmm6MKANTp4LE=
