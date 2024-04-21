@@ -13,12 +13,13 @@ import (
 
 // ParseColorString parses hex color strings (i.e. `#RRGGBB`, `RRGGBBAA`, `#RRGGBBAA`), and named colors (e.g. 'black', 'blue', ...)
 func ParseColorString(s string) (color.Color, error) {
-	if col, err := csscolorparser.Parse(s); err != nil {
+	col, err := csscolorparser.Parse(s)
+	if err != nil {
 		return nil, err
-	} else {
-		r, g, b, a := col.RGBA255()
-		return color.RGBA{r, g, b, a}, nil
 	}
+
+	r, g, b, a := col.RGBA255()
+	return color.RGBA{r, g, b, a}, nil
 }
 
 // Luminance computes the luminance (~ brightness) of the given color. Range: 0.0 for black to 1.0 for white.
