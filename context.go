@@ -634,6 +634,10 @@ func (m *Context) RenderWithBounds() (image.Image, s2.Rect, error) {
 }
 
 func (m *Context) renderLayer(gc *gg.Context, zoom int, trans *Transformer, tileSize int, provider *TileProvider) error {
+	if provider.IsNone() {
+		return nil
+	}
+
 	var wg sync.WaitGroup
 	tiles := (1 << uint(zoom))
 	fetchedTiles := make(chan *Tile)

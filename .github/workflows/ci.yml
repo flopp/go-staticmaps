@@ -45,3 +45,5 @@ jobs:
         run: $HOME/go/bin/gocyclo -over 19 $(find . -iname '*.go' -type f)
       - name: fmt
         run: test -z $(gofmt -s -l $(find . -iname '*.go' -type f))
+      - name: test
+        run: go test ./...

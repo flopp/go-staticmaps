@@ -18,7 +18,14 @@ type TileProvider struct {
 	APIKey         string
 }
 
+func (t TileProvider) IsNone() bool {
+	return len(t.URLPattern) == 0
+}
+
 func (t *TileProvider) getURL(shard string, zoom, x, y int, apikey string) string {
+	if t.IsNone() {
+		return ""
+	}
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y, apikey)
 }
 
@@ -145,6 +152,17 @@ func NewTileProviderArcgisWorldImagery() *TileProvider {
 	return t
 }
 
+// NewTileNone creates a TileProvider struct that does not provide any tiles
+func NewTileProviderNone() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "none"
+	t.Attribution = ""
+	t.TileSize = 256
+	t.URLPattern = ""
+	t.Shards = []string{}
+	return t
+}
+
 // GetTileProviders returns a map of all available TileProviders
 func GetTileProviders(thunderforestApiKey string) map[string]*TileProvider {
 	m := make(map[string]*TileProvider)
@@ -162,6 +180,7 @@ func GetTileProviders(thunderforestApiKey string) map[string]*TileProvider {
 		NewTileProviderCartoDark(),
 		NewTileProviderArcgisWorldImagery(),
 		NewTileProviderWikimedia(),
+		NewTileProviderNone(),
 	}
 
 	for _, tp := range list {
