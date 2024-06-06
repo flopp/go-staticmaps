@@ -9,12 +9,12 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/mazznoer/csscolorparser v0.1.3
 	github.com/tkrajina/gpxgo v1.4.0
-	golang.org/x/image v0.16.0
+	golang.org/x/image v0.17.0
 )
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 )
