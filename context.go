@@ -56,7 +56,7 @@ func NewContext() *Context {
 	t.width = 512
 	t.height = 512
 	t.hasZoom = false
-	t.maxZoom = 30
+	t.maxZoom = 18
 	t.hasCenter = false
 	t.hasBoundingBox = false
 	t.background = nil
