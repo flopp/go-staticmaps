@@ -325,7 +325,7 @@ func (m *Context) determineCenter(bounds s2.Rect) s2.LatLng {
 
 // adjustCenter adjust the center such that the map objects are properly centerd in the view wrt. their pixel margins.
 func (m *Context) adjustCenter(center s2.LatLng, zoom int) s2.LatLng {
-	if m.objects == nil || len(m.objects) == 0 {
+	if len(m.objects) == 0 {
 		return center
 	}
 
