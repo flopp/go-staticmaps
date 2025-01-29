@@ -9,7 +9,7 @@ require (
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mazznoer/csscolorparser v0.1.3
 	github.com/tkrajina/gpxgo v1.4.0
-	golang.org/x/image v0.17.0
+	golang.org/x/image v0.18.0
 )
 
 require (
