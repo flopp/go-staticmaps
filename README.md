@@ -50,6 +50,7 @@ import (
 func main() {
   ctx := sm.NewContext()
   ctx.SetSize(400, 300)
+	ctx.SetZoom(14)
   ctx.AddObject(
     sm.NewMarker(
       s2.LatLngFromDegrees(52.514536, 13.350151),
