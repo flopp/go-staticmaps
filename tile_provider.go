@@ -18,6 +18,7 @@ type TileProvider struct {
 	APIKey         string
 }
 
+// IsNone returns true if t is an empyt TileProvider (e.g. no configured Url)
 func (t TileProvider) IsNone() bool {
 	return len(t.URLPattern) == 0
 }
@@ -152,7 +153,7 @@ func NewTileProviderArcgisWorldImagery() *TileProvider {
 	return t
 }
 
-// NewTileNone creates a TileProvider struct that does not provide any tiles
+// NewTileProviderNone creates a TileProvider struct that does not provide any tiles
 func NewTileProviderNone() *TileProvider {
 	t := new(TileProvider)
 	t.Name = "none"
