@@ -1,6 +1,8 @@
 module github.com/flopp/go-staticmaps
 
-go 1.22
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/flopp/go-coordsparser v0.0.0-20240403152942-4891dc40d0a7
@@ -9,12 +11,12 @@ require (
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mazznoer/csscolorparser v0.1.5
 	github.com/tkrajina/gpxgo v1.4.0
-	golang.org/x/image v0.24.0
+	golang.org/x/image v0.25.0
 )
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
