@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/fogleman/gg v1.3.0
-	github.com/golang/geo v0.0.0-20250328065203-0b6e08c212fb
+	github.com/golang/geo v0.0.0-20250403143024-b4895f722f25
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mazznoer/csscolorparser v0.1.5
 	github.com/tkrajina/gpxgo v1.4.0
