@@ -2,7 +2,7 @@ module github.com/flopp/go-staticmaps
 
 go 1.23.0
 
-toolchain go1.24.3
+toolchain go1.24.4
 
 require (
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
