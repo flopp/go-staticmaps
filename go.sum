@@ -26,6 +26,8 @@ github.com/golang/geo v0.0.0-20250411042641-97e19c1a7ce7 h1:HNykSFq2QowNxC/zZc1I
 github.com/golang/geo v0.0.0-20250411042641-97e19c1a7ce7/go.mod h1:J+F9/3Ofc8ysEOY2/cNjxTMl2eB1gvPIywEHUplPgDA=
 github.com/golang/geo v0.0.0-20250417192230-a483f6ae7110 h1:buKTa/TfZH6Kf/HL22L9NpBpzglHL1aspZjRCuoS6kw=
 github.com/golang/geo v0.0.0-20250417192230-a483f6ae7110/go.mod h1:DaoiJOlOKPwoy8qrxeMEsEFBPB1P+vCktZlA+qARoWg=
+github.com/golang/geo v0.0.0-20250613135800-9e8e59d779cc h1:HeTandKJybEWXv6wW9o3ybXTNqGGV4Q6kW3S+8RsXbk=
+github.com/golang/geo v0.0.0-20250613135800-9e8e59d779cc/go.mod h1:Vaw7L5b+xa3Rj4/pRtrQkymn3lSBRB/NAEdbF9YEVLA=
 github.com/jessevdk/go-flags v1.6.1 h1:Cvu5U8UGrLay1rZfv/zP7iLpSHGUZ/Ou68T0iX1bBK4=
 github.com/jessevdk/go-flags v1.6.1/go.mod h1:Mk8T1hIAWpOiJiHa9rJASDK2UGWji0EuPGBnNLMooyc=
 github.com/mazznoer/csscolorparser v0.1.5 h1:Wr4uNIE+pHWN3TqZn2SGpA2nLRG064gB7WdSfSS5cz4=
