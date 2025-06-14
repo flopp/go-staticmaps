@@ -122,24 +122,26 @@ func NewTileProviderOpenCycleMap() *TileProvider {
 	return t
 }
 
-func newTileProviderCarto(name string) *TileProvider {
+// NewTileProviderCarto creates a TileProvider struct for Carto's tile service
+// See https://github.com/CartoDB/basemap-styles?tab=readme-ov-file#1-web-raster-basemaps for available names
+func NewTileProviderCarto(name string) *TileProvider {
 	t := new(TileProvider)
 	t.Name = fmt.Sprintf("carto-%s", name)
 	t.Attribution = "Map (c) Carto [CC BY 3.0] Data (c) OSM and contributors, ODbL."
 	t.TileSize = 256
-	t.URLPattern = "https://cartodb-basemaps-%[1]s.global.ssl.fastly.net/" + name + "_all/%[2]d/%[3]d/%[4]d.png"
+	t.URLPattern = "https://cartodb-basemaps-%[1]s.global.ssl.fastly.net/" + name + "/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{"a", "b", "c", "d"}
 	return t
 }
 
 // NewTileProviderCartoLight creates a TileProvider struct for Carto's tile service (light variant)
 func NewTileProviderCartoLight() *TileProvider {
-	return newTileProviderCarto("light")
+	return NewTileProviderCarto("light_all")
 }
 
 // NewTileProviderCartoDark creates a TileProvider struct for Carto's tile service (dark variant)
 func NewTileProviderCartoDark() *TileProvider {
-	return newTileProviderCarto("dark")
+	return NewTileProviderCarto("dark_all")
 }
 
 // NewTileProviderArcgisWorldImagery creates a TileProvider struct for Arcgis' WorldImagery tiles
@@ -177,6 +179,7 @@ func GetTileProviders(thunderforestApiKey string) map[string]*TileProvider {
 		NewTileProviderOpenTopoMap(),
 		NewTileProviderOpenStreetMaps(),
 		NewTileProviderOpenCycleMap(),
+		NewTileProviderCarto("rastertiles/voyager"),
 		NewTileProviderCartoLight(),
 		NewTileProviderCartoDark(),
 		NewTileProviderArcgisWorldImagery(),
