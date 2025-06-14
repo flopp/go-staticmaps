@@ -17,6 +17,7 @@ func main() {
 
 	// base map
 	ctx.SetTileProvider(sm.NewTileProviderOpenStreetMaps())
+	// OpenSeaMap as a overlay to the base map
 	ctx.AddOverlay(sm.NewTileProviderOpenSeaMap())
 
 	img, err := ctx.Render()
