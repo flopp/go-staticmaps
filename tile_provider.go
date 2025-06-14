@@ -122,6 +122,17 @@ func NewTileProviderOpenCycleMap() *TileProvider {
 	return t
 }
 
+// NewTileProviderOpenSeaMap creates a TileProvider struct for OpenSeaMap's tile service
+func NewTileProviderOpenSeaMap() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "sea"
+	t.Attribution = "Maps and Data (c) openstreetmaps.org and contributors, ODbL"
+	t.TileSize = 256
+	t.URLPattern = "http://t1.openseamap.org/seamark/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{}
+	return t
+}
+
 func newTileProviderCarto(name string) *TileProvider {
 	t := new(TileProvider)
 	t.Name = fmt.Sprintf("carto-%s", name)
@@ -177,6 +188,7 @@ func GetTileProviders(thunderforestApiKey string) map[string]*TileProvider {
 		NewTileProviderOpenTopoMap(),
 		NewTileProviderOpenStreetMaps(),
 		NewTileProviderOpenCycleMap(),
+		NewTileProviderOpenSeaMap(),
 		NewTileProviderCartoLight(),
 		NewTileProviderCartoDark(),
 		NewTileProviderArcgisWorldImagery(),
