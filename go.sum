@@ -36,6 +36,8 @@ github.com/mazznoer/csscolorparser v0.1.5 h1:Wr4uNIE+pHWN3TqZn2SGpA2nLRG064gB7Wd
 github.com/mazznoer/csscolorparser v0.1.5/go.mod h1:OQRVvgCyHDCAquR1YWfSwwaDcM0LhnSffGnlbOew/3I=
 github.com/mazznoer/csscolorparser v0.1.6 h1:uK6p5zBA8HaQZJSInHgHVmkVBodUAy+6snSmKJG7pqA=
 github.com/mazznoer/csscolorparser v0.1.6/go.mod h1:OQRVvgCyHDCAquR1YWfSwwaDcM0LhnSffGnlbOew/3I=
+github.com/mazznoer/csscolorparser v0.1.8 h1:i7w3wHW99d0q0KZv1ONkU/efXFAKcw1mgEgW6gj8KUA=
+github.com/mazznoer/csscolorparser v0.1.8/go.mod h1:OQRVvgCyHDCAquR1YWfSwwaDcM0LhnSffGnlbOew/3I=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
