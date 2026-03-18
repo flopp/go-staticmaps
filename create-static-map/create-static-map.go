@@ -171,6 +171,7 @@ func main() {
 		Areas              []string `short:"a" long:"area" description:"Add an area to the static map" value-name:"AREA"`
 		Circles            []string `short:"C" long:"circle" description:"Add a circle to the static map" value-name:"CIRCLE"`
 		ThunderforstAPIKey string   `long:"thunderforestapikey" description:"API key to use with Thunderforst tile servers" value-name:"APIKEY" default:"NONE"`
+		Attribution        string   `long:"attribution" description:"Override the attribution text" value-name:"ATTRIBUTION"`
 	}
 
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
@@ -211,6 +212,10 @@ func main() {
 
 	if parser.FindOptionByLongName("useragent").IsSet() {
 		ctx.SetUserAgent(opts.UserAgent)
+	}
+
+	if parser.FindOptionByLongName("attribution").IsSet() {
+		ctx.OverrideAttribution(opts.Attribution)
 	}
 
 	handleAreasOption(ctx, opts.Areas)
