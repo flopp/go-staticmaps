@@ -116,6 +116,7 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -127,8 +128,6 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("GET %s: %s", url, resp.Status)
 	}
-
-	defer resp.Body.Close()
 
 	contents, err := io.ReadAll(resp.Body)
 	if err != nil {
