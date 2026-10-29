@@ -1,13 +1,11 @@
 module github.com/flopp/go-staticmaps
 
-go 1.23.0
-
-toolchain go1.24.4
+go 1.25.0
 
 require (
 	github.com/flopp/go-coordsparser v0.0.0-20250311184423-61a7ff62d17c
 	github.com/fogleman/gg v1.3.0
-	github.com/golang/geo v0.0.0-20260302211937-87f5a40ea07a
+	github.com/golang/geo v0.0.0-20261029132150-f51d36688936
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/mazznoer/csscolorparser v0.1.8
 	github.com/tkrajina/gpxgo v1.4.0
